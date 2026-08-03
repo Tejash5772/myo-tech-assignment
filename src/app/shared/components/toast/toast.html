@@ -1,0 +1,14 @@
+<div class="position-fixed top-0 end-0 p-3" style="z-index:9999;">
+
+    @for(toast of toastService.toasts();track toast.id){
+
+    <div class="alert" [class.alert-success]="toast.type==='success'" [class.alert-danger]="toast.type==='error'"
+        [class.alert-warning]="toast.type==='warning'" [class.alert-info]="toast.type==='info'">
+
+        {{toast.message}}
+
+    </div>
+
+    }
+
+</div>
