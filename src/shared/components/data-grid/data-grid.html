@@ -1,0 +1,73 @@
+<table class="table table-bordered table-hover">
+
+    <thead>
+
+        <tr>
+
+            <th *ngFor="let column of columns" (click)="column.sortable && onSort(column.field.toString())">
+
+                {{column.header}}
+
+                <span *ngIf="column.sortable">
+
+                    ▲▼
+
+                </span>
+
+            </th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        <tr *ngFor="let row of data">
+
+            <td *ngFor="let column of columns">
+
+                <ng-container *ngIf="column.template; else defaultCell">
+
+                    <ng-container *ngTemplateOutlet="
+column.template;
+context:{$implicit:row}
+">
+                    </ng-container>
+
+                </ng-container>
+
+                <ng-template #defaultCell>
+
+                    {{row[column.field]}}
+
+                </ng-template>
+
+            </td>
+
+        </tr>
+
+    </tbody>
+
+</table>
+
+<div class="d-flex justify-content-end">
+
+    <button class="btn btn-primary" (click)="pageChange.emit(page-1)" [disabled]="page==1">
+
+        Previous
+
+    </button>
+
+    <span class="mx-3">
+
+        {{page}}
+
+    </span>
+
+    <button class="btn btn-primary" (click)="pageChange.emit(page+1)" [disabled]="page*pageSize>=total">
+
+        Next
+
+    </button>
+
+</div>
