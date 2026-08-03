@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { GridColumn } from '../../../../shared/models/grid-column';
 import { ProductService } from '../../services/product.service';
-import { Product } from '../../models/product';
 import { DataGrid } from '../../../../shared/components/data-grid/data-grid';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Product } from '../../../../core/models/product';
+import { GridColumn } from '../../../../core/models/grid-column';
 
 @Component({
   selector: 'app-product-list',

@@ -3,3 +3,8 @@ export interface Pagination {
     limit: number;
     total: number;
 }
+
+export interface PagedResponse<T> {
+    items: T[];
+    pagination: Pagination;
+}
