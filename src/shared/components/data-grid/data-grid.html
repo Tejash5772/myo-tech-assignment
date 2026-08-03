@@ -1,70 +1,109 @@
-<table class="table table-bordered table-hover">
+<div class="card shadow-sm">
 
-    <thead>
+    @if(loading){
 
-        <tr>
+    <div class="p-5 text-center">
 
-            <th *ngFor="let column of columns" (click)="column.sortable && onSort(column.field.toString())">
+        <div class="spinner-border"></div>
 
-                {{column.header}}
+    </div>
 
-                <span *ngIf="column.sortable">
+    }@else{
 
-                    ▲▼
+    <table class="table table-hover mb-0">
 
-                </span>
+        <thead>
 
-            </th>
+            <tr>
 
-        </tr>
+                @for(column of columns; track column.field){
 
-    </thead>
+                <th (click)="sort(column)" [style.width]="column.width">
 
-    <tbody>
+                    {{column.header}}
 
-        <tr *ngFor="let row of data">
+                    @if(column.sortable){
 
-            <td *ngFor="let column of columns">
+                    <span>
 
-                <ng-container *ngIf="column.template; else defaultCell">
+                        @if(sortField===column.field){
+
+                        {{sortDirection==='asc' ? '▲' : '▼'}}
+
+                        }@else{
+
+                        ⇅
+
+                        }
+
+                    </span>
+
+                    }
+
+                </th>
+
+                }
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @for(row of rows; track $index){
+
+            <tr>
+
+                @for(column of columns; track column.field){
+
+                <td>
+
+                    @if(column.template){
 
                     <ng-container *ngTemplateOutlet="
-column.template;
-context:{$implicit:row}
-">
+                        column.template;
+                        context:{
+                            $implicit:row
+                        }">
                     </ng-container>
 
-                </ng-container>
-
-                <ng-template #defaultCell>
+                    }@else{
 
                     {{row[column.field]}}
 
-                </ng-template>
+                    }
 
-            </td>
+                </td>
 
-        </tr>
+                }
 
-    </tbody>
+            </tr>
 
-</table>
+            }
 
-<div class="d-flex justify-content-end">
+        </tbody>
 
-    <button class="btn btn-primary" (click)="pageChange.emit(page-1)" [disabled]="page==1">
+    </table>
+
+    }
+
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+
+    <button class="btn btn-outline-primary" (click)="previousPage()" [disabled]="page===1">
 
         Previous
 
     </button>
 
-    <span class="mx-3">
+    <div>
 
-        {{page}}
+        Page {{page}}
 
-    </span>
+    </div>
 
-    <button class="btn btn-primary" (click)="pageChange.emit(page+1)" [disabled]="page*pageSize>=total">
+    <button class="btn btn-outline-primary" (click)="nextPage()">
 
         Next
 

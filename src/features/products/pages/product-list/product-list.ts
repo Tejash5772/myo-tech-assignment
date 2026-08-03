@@ -1,84 +1,119 @@
-import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../../services/product.service';
-import { DataGrid } from '../../../../shared/components/data-grid/data-grid';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  switchMap
+} from 'rxjs';
+
 import { Product } from '../../../../core/models/product';
-import { GridColumn } from '../../../../core/models/grid-column';
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [DataGrid],
-  templateUrl: './product-list.html',
-  styleUrls: ['./product-list.scss']
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
 })
 export class ProductList implements OnInit {
 
-  products: Product[] = [];
-  total = 0;
-  page = 1;
-  pageSize = 10;
-  columns: GridColumn<Product>[] = [
-    {
-      field: 'name',
-      header: 'Product'
-    },
-    {
-      field: 'price',
-      header: 'Price',
-      sortable: true
-    },
-    {
-      field: 'stock',
-      header: 'Stock',
-      sortable: true
-    },
-    {
-      field: 'status',
-      header: 'Status'
-    }
-  ];
+  private readonly productService = inject(ProductService);
 
-  constructor(
-    private productService: ProductService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) { }
+  readonly products = signal<Product[]>([]);
 
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.page = Number(params['page'] || 1);
-      this.pageSize = Number(params['pageSize'] || 10);
-      this.loadProducts();
-    });
+  readonly loading = signal(false);
 
-  }
+  readonly search = signal('');
 
-  loadProducts() {
-    this.productService.getAll({
-      _page: this.page,
-      _limit: this.pageSize
-    }).subscribe({
-      next: (data) => {
-        this.products = data;
+  private readonly searchSubject = new Subject<string>();
+
+  ngOnInit(): void {
+
+    this.loadProducts();
+
+    this.searchSubject.pipe(
+
+      debounceTime(300),
+
+      distinctUntilChanged(),
+
+      switchMap(search => {
+
+        this.loading.set(true);
+
+        return this.productService.search({
+
+          q: search
+
+        });
+
+      })
+
+    ).subscribe({
+
+      next: products => {
+
+        this.products.set(products);
+
+        this.loading.set(false);
+
       },
-      error: (err) => {
-        console.error(err);
+
+      error: () => {
+
+        this.loading.set(false);
+
       }
+
     });
+
   }
 
-  loadPage(page: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        page
-      },
-      queryParamsHandling: 'merge'
-    });
+  loadProducts(): void {
+
+    this.loading.set(true);
+
+    this.productService.getAll()
+
+      .subscribe({
+
+        next: products => {
+
+          this.products.set(products);
+
+          this.loading.set(false);
+
+        },
+
+        error: () => {
+
+          this.loading.set(false);
+
+        }
+
+      });
+
   }
 
-  sort(event: any) {
-    console.log(event);
+  onSearch(value: string): void {
+
+    this.search.set(value);
+
+    this.searchSubject.next(value);
+
   }
+
 }

@@ -1,47 +1,65 @@
 import {
   Component,
+  EventEmitter,
   Input,
-  Output,
-  EventEmitter
+  Output
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { GridColumn } from '../../../core/models/grid-column';
+import { GridSort } from '../../../core/models/grid-sort';
 
 @Component({
   selector: 'app-data-grid',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './data-grid.html',
-  styleUrls: ['./data-grid.scss']
+  templateUrl: './data-grid.component.html',
+  styleUrl: './data-grid.component.scss'
 })
 export class DataGrid {
 
-  @Input() columns: GridColumn[] = [];
+  @Input({ required: true })
+  rows: unknown[] = [];
 
-  @Input() data: any[] = [];
+  @Input({ required: true })
+  columns: GridColumn[] = [];
 
-  @Input() total = 0;
+  @Input()
+  loading = false;
 
-  @Input() page = 1;
+  @Input()
+  page = 1;
 
-  @Input() pageSize = 10;
+  @Input()
+  pageSize = 10;
 
-  @Output() pageChange = new EventEmitter<number>();
+  @Input()
+  totalRecords = 0;
 
-  @Output() sortChange =
-    new EventEmitter<{ field: string, order: 'asc' | 'desc' }>();
+  @Output()
+  pageChange = new EventEmitter<number>();
+
+  @Output()
+  sortChange = new EventEmitter<GridSort>();
 
   sortField = '';
 
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
-  onSort(field: string) {
+  sort(column: GridColumn): void {
+
+    if (!column.sortable) {
+
+      return;
+
+    }
+
+    const field = column.field.toString();
 
     if (this.sortField === field) {
 
-      this.sortOrder =
-        this.sortOrder === 'asc'
+      this.sortDirection =
+        this.sortDirection === 'asc'
           ? 'desc'
           : 'asc';
 
@@ -49,7 +67,7 @@ export class DataGrid {
 
       this.sortField = field;
 
-      this.sortOrder = 'asc';
+      this.sortDirection = 'asc';
 
     }
 
@@ -57,9 +75,33 @@ export class DataGrid {
 
       field,
 
-      order: this.sortOrder
+      direction: this.sortDirection
 
     });
+
+  }
+
+  previousPage(): void {
+
+    if (this.page > 1) {
+
+      this.pageChange.emit(this.page - 1);
+
+    }
+
+  }
+
+  nextPage(): void {
+
+    const totalPages = Math.ceil(
+      this.totalRecords / this.pageSize
+    );
+
+    if (this.page < totalPages) {
+
+      this.pageChange.emit(this.page + 1);
+
+    }
 
   }
 

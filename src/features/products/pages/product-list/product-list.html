@@ -1,6 +1,66 @@
 <div class="container mt-4">
-    <h3>Products</h3>
-    <app-data-grid [data]="products" [columns]="columns" [page]="page" [pageSize]="pageSize" [total]="total"
-        (pageChange)="loadPage($event)" (sortChange)="sort($event)">
-    </app-data-grid>
+
+    <div class="row mb-3">
+
+        <div class="col-md-4">
+
+            <input class="form-control" type="text" placeholder="Search Products..." [ngModel]="search()"
+                (ngModelChange)="onSearch($event)">
+
+        </div>
+
+    </div>
+
+    @if (loading()) {
+
+    <div class="text-center">
+
+        <div class="spinner-border"></div>
+
+    </div>
+
+    } @else {
+
+    <table class="table table-striped">
+
+        <thead>
+
+            <tr>
+
+                <th>Name</th>
+
+                <th>Price</th>
+
+                <th>Stock</th>
+
+                <th>Status</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @for(product of products(); track product.id){
+
+            <tr>
+
+                <td>{{product.name}}</td>
+
+                <td>{{product.price}}</td>
+
+                <td>{{product.stock}}</td>
+
+                <td>{{product.status}}</td>
+
+            </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+    }
+
 </div>

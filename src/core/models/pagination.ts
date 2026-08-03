@@ -1,10 +1,5 @@
-export interface Pagination {
+export interface GridPagination {
     page: number;
-    limit: number;
+    pageSize: number;
     total: number;
-}
-
-export interface PagedResponse<T> {
-    items: T[];
-    pagination: Pagination;
 }

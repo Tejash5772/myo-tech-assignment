@@ -1,4 +1,25 @@
+table {
+
+    margin: 0;
+
+}
+
 th {
+
     cursor: pointer;
+
     user-select: none;
+
+}
+
+th:hover {
+
+    background: #f8f9fa;
+
+}
+
+.card {
+
+    border-radius: 10px;
+
 }
