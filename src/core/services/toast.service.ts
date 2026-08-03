@@ -1,10 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
+
 export interface Toast {
 
-    type: 'success' | 'error' | 'warning';
+    id: number;
+
+    type: ToastType;
 
     message: string;
+
+    duration?: number;
 
 }
 
@@ -13,15 +19,49 @@ export interface Toast {
 })
 export class ToastService {
 
-    toast = signal<Toast | null>(null);
+    readonly toasts = signal<Toast[]>([]);
 
-    show(type: Toast['type'], message: string) {
+    show(
+        type: ToastType,
+        message: string,
+        duration = 5000
+    ): void {
 
-        this.toast.set({ type, message });
+        const toast: Toast = {
+
+            id: Date.now(),
+
+            type,
+
+            message,
+
+            duration
+
+        };
+
+        this.toasts.update(value => [...value, toast]);
 
         setTimeout(() => {
-            this.toast.set(null);
-        }, 5000);
+
+            this.remove(toast.id);
+
+        }, duration);
+
+    }
+
+    remove(id: number): void {
+
+        this.toasts.update(value =>
+
+            value.filter(x => x.id !== id)
+
+        );
+
+    }
+
+    clear(): void {
+
+        this.toasts.set([]);
 
     }
 

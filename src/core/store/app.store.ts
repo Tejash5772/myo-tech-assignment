@@ -1,21 +1,58 @@
-import { Injectable, signal, computed } from "@angular/core";
-import { Product } from "../../features/products/models/product";
+import {
+    Injectable,
+    computed,
+    signal
+} from '@angular/core';
+
+import { Product } from '../models/product';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppStore {
 
-    cart = signal<Product[]>([]);
+    readonly cart = signal<Product[]>([]);
 
-    preferences = signal({
+    readonly preferences = signal({
 
-        theme: 'light',
+        language: 'en',
 
-        language: 'en'
+        theme: 'light'
 
     });
 
-    cartCount = computed(() => this.cart().length);
+    readonly cartCount = computed(() =>
+
+        this.cart().length
+
+    );
+
+    addToCart(product: Product): void {
+
+        this.cart.update(items => [
+
+            ...items,
+
+            product
+
+        ]);
+
+    }
+
+    removeFromCart(id: number): void {
+
+        this.cart.update(items =>
+
+            items.filter(item => item.id !== id)
+
+        );
+
+    }
+
+    clearCart(): void {
+
+        this.cart.set([]);
+
+    }
 
 }
