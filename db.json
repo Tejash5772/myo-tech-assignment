@@ -1,0 +1,31 @@
+{
+    "products": [
+        {
+            "id": 1,
+            "name": "MacBook Pro",
+            "categoryId": 1,
+            "price": 180000,
+            "stock": 5,
+            "status": "Active",
+            "createdAt": "2026-08-03"
+        },
+        {
+            "id": 2,
+            "name": "iPhone 17",
+            "categoryId": 2,
+            "price": 120000,
+            "stock": 10,
+            "status": "Active",
+            "createdAt": "2026-08-03"
+        },
+        {
+            "id": 3,
+            "name": "Dell XPS",
+            "categoryId": 1,
+            "price": 150000,
+            "stock": 3,
+            "status": "Inactive",
+            "createdAt": "2026-08-03"
+        }
+    ]
+}

@@ -1,11 +1,12 @@
 import { Injectable, signal, computed } from "@angular/core";
+import { Product } from "../../features/products/models/product";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppStore {
 
-    cart = signal<any[]>([]);
+    cart = signal<Product[]>([]);
 
     preferences = signal({
 

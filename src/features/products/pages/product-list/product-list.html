@@ -1,0 +1,6 @@
+<div class="container mt-4">
+    <h3>Products</h3>
+    <app-data-grid [data]="products" [columns]="columns" [page]="page" [pageSize]="pageSize" [total]="total"
+        (pageChange)="loadPage($event)" (sortChange)="sort($event)">
+    </app-data-grid>
+</div>
