@@ -40,6 +40,15 @@
       "stock": 3,
       "status": "Inactive",
       "createdAt": "2026-08-03"
+    },
+    {
+      "name": "huy",
+      "categoryId": "2",
+      "price": 6000,
+      "stock": 45,
+      "status": "Active",
+      "createdAt": "2026-08-04",
+      "id": 4
     }
   ]
 }

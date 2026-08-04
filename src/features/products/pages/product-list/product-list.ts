@@ -21,7 +21,8 @@ import {
   debounceTime,
   distinctUntilChanged,
   switchMap,
-  tap
+  tap,
+  finalize
 } from 'rxjs';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -29,13 +30,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductService } from '../../services/product.service';
 
 import { Product } from '../../../../core/models/product';
+import { Category } from '../../../../core/models/category';
 
 import { GridColumn } from '../../../../core/models/grid-column';
 import { GridSort } from '../../../../core/models/grid-sort';
 
 import { DataGrid } from '../../../../shared/components/data-grid/data-grid';
 import { ProductForm } from '../product-form/product-form';
-import { Category } from '../../../../core/models/category';
 
 @Component({
   selector: 'app-product-list',
@@ -52,37 +53,26 @@ import { Category } from '../../../../core/models/category';
 export class ProductList implements OnInit {
 
   private readonly productService = inject(ProductService);
-
   private readonly router = inject(Router);
-
   private readonly route = inject(ActivatedRoute);
-
   private readonly destroyRef = inject(DestroyRef);
 
   readonly products = signal<Product[]>([]);
-
   readonly loading = signal(false);
-
   readonly totalRecords = signal(0);
-
   readonly search = signal('');
 
   readonly showModal = signal(false);
-
   readonly selectedProduct = signal<Product | null>(null);
-
   readonly categories = signal<Category[]>([]);
 
   @ViewChild('actionTemplate', { static: true })
-
-  actionTemplate!: TemplateRef<any>;
+  actionTemplate!: TemplateRef<Product>;
 
   page = 1;
-
   pageSize = 10;
 
   sortField = 'id';
-
   sortDirection: 'asc' | 'desc' = 'asc';
 
   columns: GridColumn[] = [];
@@ -90,6 +80,7 @@ export class ProductList implements OnInit {
   private readonly searchSubject = new Subject<string>();
 
   ngOnInit(): void {
+
     this.columns = [
 
       {
@@ -97,31 +88,26 @@ export class ProductList implements OnInit {
         header: 'ID',
         sortable: true
       },
-
       {
         field: 'name',
         header: 'Product',
         sortable: true
       },
-
       {
         field: 'price',
         header: 'Price',
         sortable: true
       },
-
       {
         field: 'stock',
         header: 'Stock',
         sortable: true
       },
-
       {
         field: 'status',
         header: 'Status',
         sortable: true
       },
-
       {
         field: 'actions',
         header: 'Actions',
@@ -130,12 +116,13 @@ export class ProductList implements OnInit {
 
     ];
 
-    const categories = this.route.snapshot.data['categories'];
-
-    this.categories.set(categories);
+    this.categories.set(
+      this.route.snapshot.data['categories'] ?? []
+    );
 
     this.route.queryParams
       .pipe(
+
         tap(params => {
 
           this.page = +(params['page'] ?? 1);
@@ -149,9 +136,15 @@ export class ProductList implements OnInit {
           this.search.set(params['search'] ?? '');
 
         }),
+
         takeUntilDestroyed(this.destroyRef)
+
       )
-      .subscribe(() => this.loadProducts());
+      .subscribe(() => {
+
+        this.loadProducts();
+
+      });
 
     this.searchSubject
       .pipe(
@@ -159,12 +152,6 @@ export class ProductList implements OnInit {
         debounceTime(400),
 
         distinctUntilChanged(),
-
-        tap(() => {
-
-          this.page = 1;
-
-        }),
 
         switchMap(() => this.fetchProducts()),
 
@@ -182,13 +169,9 @@ export class ProductList implements OnInit {
     return this.productService.search({
 
       _page: this.page,
-
       _limit: this.pageSize,
-
       _sort: this.sortField,
-
       _order: this.sortDirection,
-
       q: this.search()
 
     }).pipe(
@@ -198,6 +181,10 @@ export class ProductList implements OnInit {
         this.products.set(result.items);
 
         this.totalRecords.set(result.total);
+
+      }),
+
+      finalize(() => {
 
         this.loading.set(false);
 
@@ -209,13 +196,19 @@ export class ProductList implements OnInit {
 
   loadProducts(): void {
 
-    this.fetchProducts().subscribe();
+    this.fetchProducts()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe();
 
   }
 
   onSearch(value: string): void {
 
     this.search.set(value);
+
+    this.page = 1;
 
     this.updateQueryParams();
 
@@ -247,6 +240,8 @@ export class ProductList implements OnInit {
 
     this.sortDirection = sort.direction;
 
+    this.page = 1;
+
     this.updateQueryParams();
 
   }
@@ -260,13 +255,9 @@ export class ProductList implements OnInit {
       queryParams: {
 
         page: this.page,
-
         pageSize: this.pageSize,
-
         sortField: this.sortField,
-
         sortDirection: this.sortDirection,
-
         search: this.search()
 
       },
@@ -295,13 +286,13 @@ export class ProductList implements OnInit {
 
   closeModal(): void {
 
+    this.selectedProduct.set(null);
+
     this.showModal.set(false);
 
   }
 
   saveProduct(product: Partial<Product>): void {
-
-    this.loading.set(true);
 
     const request = this.selectedProduct()
 
@@ -314,39 +305,33 @@ export class ProductList implements OnInit {
 
         ...product,
 
-        createdAt: new Date().toISOString().split('T')[0]
+        createdAt: new Date()
+          .toISOString()
+          .split('T')[0]
 
       });
 
-    request.subscribe({
+    request
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
 
-      next: () => {
+        next: () => {
 
-        this.closeModal();
+          this.closeModal();
 
-        this.loadProducts();
+          this.loadProducts();
 
-      },
+        }
 
-      error: () => {
-
-        this.loading.set(false);
-
-      }
-
-    });
+      });
 
   }
 
   deleteProduct(product: Product): void {
 
-    const confirmed = confirm(
-
-      `Delete "${product.name}" ?`
-
-    );
-
-    if (!confirmed) {
+    if (!confirm(`Delete "${product.name}" ?`)) {
 
       return;
 
@@ -356,9 +341,24 @@ export class ProductList implements OnInit {
 
     this.productService
       .delete(product.id)
-      .subscribe(() => {
+      .pipe(
 
-        this.loadProducts();
+        finalize(() => {
+
+          this.loading.set(false);
+
+        }),
+
+        takeUntilDestroyed(this.destroyRef)
+
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.loadProducts();
+
+        }
 
       });
 

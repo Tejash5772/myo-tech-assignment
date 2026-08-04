@@ -10,6 +10,17 @@
 
         <input class="form-control" formControlName="name">
 
+        @if (form.controls.name.invalid &&
+        form.controls.name.touched) {
+
+        <div class="text-danger">
+
+            Product name is required.
+
+        </div>
+
+        }
+
     </div>
 
     <div class="mb-3">
@@ -46,6 +57,17 @@
 
         <input class="form-control" type="number" formControlName="price">
 
+        @if (form.controls.price.invalid &&
+        form.controls.price.touched) {
+
+        <div class="text-danger">
+
+            Product price is required.
+
+        </div>
+
+        }
+
     </div>
 
     <div class="mb-3">
@@ -57,6 +79,17 @@
         </label>
 
         <input class="form-control" type="number" formControlName="stock">
+
+        @if (form.controls.stock.invalid &&
+        form.controls.stock.touched) {
+
+        <div class="text-danger">
+
+            Product stock is required.
+
+        </div>
+
+        }
 
     </div>
 
@@ -90,7 +123,7 @@
 
         </button>
 
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
 
             Save
 

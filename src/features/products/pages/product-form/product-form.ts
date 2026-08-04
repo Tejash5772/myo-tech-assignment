@@ -61,17 +61,33 @@ export class ProductForm implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
 
-    if (changes['product'] && this.product) {
+    if (changes['product']) {
 
-      this.form.patchValue({
+      if (this.product) {
 
-        name: this.product.name,
-        categoryId: this.product.categoryId,
-        price: this.product.price,
-        stock: this.product.stock,
-        status: this.product.status
+        this.form.patchValue({
 
-      });
+          name: this.product.name,
+          categoryId: this.product.categoryId,
+          price: this.product.price,
+          stock: this.product.stock,
+          status: this.product.status
+
+        });
+
+      } else {
+
+        this.form.reset({
+
+          name: '',
+          categoryId: 1,
+          price: 0,
+          stock: 0,
+          status: 'Active'
+
+        });
+
+      }
 
     }
 
