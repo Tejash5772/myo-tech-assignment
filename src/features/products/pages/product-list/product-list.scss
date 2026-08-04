@@ -1,7 +1,29 @@
-table {
-    vertical-align: middle;
+.container-fluid {
+    max-width: 1400px;
 }
 
-th {
+h2 {
     font-weight: 600;
+}
+
+input {
+    max-width: 350px;
+}
+
+.modal-backdrop-custom {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.modal-content-custom {
+    background: #fff;
+    border-radius: 12px;
+    width: 600px;
+    max-width: 90vw;
+    padding: 24px;
 }

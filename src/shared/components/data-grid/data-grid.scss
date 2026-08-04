@@ -1,25 +1,57 @@
-table {
-
-    margin: 0;
-
-}
-
-th {
-
-    cursor: pointer;
-
-    user-select: none;
-
-}
-
-th:hover {
-
-    background: #f8f9fa;
-
+:host {
+    display: block;
 }
 
 .card {
+    border: none;
+    border-radius: 12px;
+}
 
-    border-radius: 10px;
+.table {
+    margin-bottom: 0;
+}
 
+.table thead th {
+    white-space: nowrap;
+    user-select: none;
+    font-weight: 600;
+}
+
+.table thead th.sortable {
+    cursor: pointer;
+}
+
+.table tbody tr {
+    cursor: pointer;
+    transition: background-color .2s;
+}
+
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.sort-icon {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, .7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.table-responsive {
+    overflow-x: auto;
 }

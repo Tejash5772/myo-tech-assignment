@@ -1,0 +1,80 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+    @for (field of fields; track field.name) {
+
+    <div class="mb-3">
+
+        <label class="form-label">
+
+            {{ field.label }}
+
+        </label>
+
+        @switch (field.type) {
+
+        @case ('text') {
+
+        <input class="form-control" type="text" [placeholder]="field.placeholder ?? ''" [formControlName]="field.name">
+
+        }
+
+        @case ('number') {
+
+        <input class="form-control" type="number" [placeholder]="field.placeholder ?? ''"
+            [formControlName]="field.name">
+
+        }
+
+        @case ('textarea') {
+
+        <textarea class="form-control" rows="3" [placeholder]="field.placeholder ?? ''" [formControlName]="field.name">
+          </textarea>
+
+        }
+
+        @case ('select') {
+
+        <select class="form-select" [formControlName]="field.name">
+
+            @for (option of field.options ?? []; track option.value) {
+
+            <option [value]="option.value">
+
+                {{ option.label }}
+
+            </option>
+
+            }
+
+        </select>
+
+        }
+
+        }
+
+        @if (form.get(field.name)?.invalid &&
+        form.get(field.name)?.touched) {
+
+        <div class="text-danger mt-1">
+
+            {{ field.label }} is required.
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
+    <div class="text-end">
+
+        <button type="submit" class="btn btn-primary">
+
+            Submit
+
+        </button>
+
+    </div>
+
+</form>

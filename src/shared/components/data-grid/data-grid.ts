@@ -2,24 +2,32 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output
+  Output,
+  signal
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule,
+  NgTemplateOutlet
+} from '@angular/common';
+
 import { GridColumn } from '../../../core/models/grid-column';
 import { GridSort } from '../../../core/models/grid-sort';
 
 @Component({
   selector: 'app-data-grid',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './data-grid.component.html',
-  styleUrl: './data-grid.component.scss'
+  imports: [
+    CommonModule,
+    NgTemplateOutlet
+  ],
+  templateUrl: './data-grid.html',
+  styleUrl: './data-grid.scss'
 })
 export class DataGrid {
 
   @Input({ required: true })
-  rows: unknown[] = [];
+  rows: any[] = [];
 
   @Input({ required: true })
   columns: GridColumn[] = [];
@@ -40,68 +48,73 @@ export class DataGrid {
   pageChange = new EventEmitter<number>();
 
   @Output()
+  pageSizeChange = new EventEmitter<number>();
+
+  @Output()
   sortChange = new EventEmitter<GridSort>();
 
-  sortField = '';
+  @Output()
+  rowClick = new EventEmitter<any>();
 
-  sortDirection: 'asc' | 'desc' = 'asc';
+  readonly sortField = signal('');
+
+  readonly sortDirection = signal<'asc' | 'desc'>('asc');
+
+  get totalPages(): number {
+    return Math.max(
+      1,
+      Math.ceil(this.totalRecords / this.pageSize)
+    );
+  }
 
   sort(column: GridColumn): void {
 
     if (!column.sortable) {
-
       return;
-
     }
 
     const field = column.field.toString();
 
-    if (this.sortField === field) {
-
-      this.sortDirection =
-        this.sortDirection === 'asc'
-          ? 'desc'
-          : 'asc';
-
+    if (this.sortField() === field) {
+      this.sortDirection.update(value =>
+        value === 'asc' ? 'desc' : 'asc'
+      );
     } else {
-
-      this.sortField = field;
-
-      this.sortDirection = 'asc';
-
+      this.sortField.set(field);
+      this.sortDirection.set('asc');
     }
 
     this.sortChange.emit({
-
       field,
-
-      direction: this.sortDirection
-
+      direction: this.sortDirection()
     });
-
   }
 
   previousPage(): void {
 
     if (this.page > 1) {
-
       this.pageChange.emit(this.page - 1);
-
     }
 
   }
 
   nextPage(): void {
 
-    const totalPages = Math.ceil(
-      this.totalRecords / this.pageSize
-    );
-
-    if (this.page < totalPages) {
-
+    if (this.page < this.totalPages) {
       this.pageChange.emit(this.page + 1);
-
     }
+
+  }
+
+  changePageSize(size: number): void {
+
+    this.pageSizeChange.emit(size);
+
+  }
+
+  onRowClick(row: any): void {
+
+    this.rowClick.emit(row);
 
   }
 

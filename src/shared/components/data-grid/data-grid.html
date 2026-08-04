@@ -1,112 +1,157 @@
-<div class="card shadow-sm">
+<div class="card shadow-sm position-relative">
 
-    @if(loading){
-
-    <div class="p-5 text-center">
-
-        <div class="spinner-border"></div>
-
+    @if (loading) {
+    <div class="loading-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
+    }
 
-    }@else{
+    <div class="table-responsive">
 
-    <table class="table table-hover mb-0">
+        <table class="table table-hover align-middle mb-0">
 
-        <thead>
+            <thead class="table-light">
 
-            <tr>
+                <tr>
 
-                @for(column of columns; track column.field){
+                    @for (column of columns; track column.field) {
 
-                <th (click)="sort(column)" [style.width]="column.width">
+                    <th [style.width]="column.width" (click)="sort(column)" [class.sortable]="column.sortable">
 
-                    {{column.header}}
+                        <div class="d-flex align-items-center">
 
-                    @if(column.sortable){
+                            <span>{{ column.header }}</span>
 
-                    <span>
+                            @if (column.sortable) {
 
-                        @if(sortField===column.field){
+                            <span class="sort-icon ms-2">
 
-                        {{sortDirection==='asc' ? '▲' : '▼'}}
+                                @if (sortField() === column.field.toString()) {
 
-                        }@else{
+                                {{ sortDirection() === 'asc' ? '▲' : '▼' }}
 
-                        ⇅
+                                } @else {
+
+                                ⇅
+
+                                }
+
+                            </span>
+
+                            }
+
+                        </div>
+
+                    </th>
+
+                    }
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (rows.length === 0) {
+
+                <tr>
+
+                    <td class="text-center py-5 text-muted" [attr.colspan]="columns.length">
+
+                        No records found
+
+                    </td>
+
+                </tr>
+
+                } @else {
+
+                @for (row of rows; track row.id ?? $index) {
+
+                <tr (click)="onRowClick(row)">
+
+                    @for (column of columns; track column.field) {
+
+                    <td>
+
+                        @if (column.template) {
+
+                        <ng-container *ngTemplateOutlet="
+                        column.template;
+                        context: {
+                          $implicit: row
+                        }
+                      ">
+                        </ng-container>
+
+                        } @else {
+
+                        {{ $any(row)[column.field] }}
 
                         }
 
-                    </span>
+                    </td>
 
                     }
 
-                </th>
+                </tr>
 
                 }
 
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            @for(row of rows; track $index){
-
-            <tr>
-
-                @for(column of columns; track column.field){
-
-                <td>
-
-                    @if(column.template){
-
-                    <ng-container *ngTemplateOutlet="
-                        column.template;
-                        context:{
-                            $implicit:row
-                        }">
-                    </ng-container>
-
-                    }@else{
-
-                    {{row[column.field]}}
-
-                    }
-
-                </td>
-
                 }
 
-            </tr>
+            </tbody>
 
-            }
-
-        </tbody>
-
-    </table>
-
-    }
-
-</div>
-
-<div class="d-flex justify-content-between align-items-center mt-3">
-
-    <button class="btn btn-outline-primary" (click)="previousPage()" [disabled]="page===1">
-
-        Previous
-
-    </button>
-
-    <div>
-
-        Page {{page}}
+        </table>
 
     </div>
 
-    <button class="btn btn-outline-primary" (click)="nextPage()">
+</div>
 
-        Next
+<div class="pagination-container mt-3">
 
-    </button>
+    <div class="d-flex align-items-center gap-2">
+
+        <button class="btn btn-outline-primary btn-sm" (click)="previousPage()" [disabled]="page === 1">
+
+            Previous
+
+        </button>
+
+        <span>
+
+            Page {{ page }} of {{ totalPages }}
+
+        </span>
+
+        <button class="btn btn-outline-primary btn-sm" (click)="nextPage()" [disabled]="page >= totalPages">
+
+            Next
+
+        </button>
+
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+
+        <label class="mb-0">
+
+            Rows
+
+        </label>
+
+        <select class="form-select form-select-sm" style="width:90px" [value]="pageSize"
+            (change)="changePageSize(+$any($event.target).value)">
+
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="25">25</option>
+            <option [value]="50">50</option>
+
+        </select>
+
+    </div>
 
 </div>

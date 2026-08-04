@@ -1,65 +1,81 @@
-<div class="container mt-4">
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="mb-0">
+            Products
+        </h2>
+
+        <button class="btn btn-primary" (click)="openAddProduct()">
+
+            Add Product
+
+        </button>
+
+    </div>
 
     <div class="row mb-3">
 
         <div class="col-md-4">
 
-            <input class="form-control" type="text" placeholder="Search Products..." [ngModel]="search()"
+            <input class="form-control" type="text" placeholder="Search products..." [ngModel]="search()"
                 (ngModelChange)="onSearch($event)">
 
         </div>
 
     </div>
 
-    @if (loading()) {
+    <ng-template #actionTemplate let-product>
 
-    <div class="text-center">
+        <div class="d-flex gap-2">
 
-        <div class="spinner-border"></div>
+            <button class="btn btn-sm btn-outline-primary" (click)="openEditProduct(product); $event.stopPropagation()">
+
+                Edit
+
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product); $event.stopPropagation()">
+
+                Delete
+
+            </button>
+
+        </div>
+
+    </ng-template>
+
+    <app-data-grid [rows]="products()" [columns]="columns" [loading]="loading()" [page]="page" [pageSize]="pageSize"
+        [totalRecords]="totalRecords()" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
+        (sortChange)="onSortChange($event)">
+
+    </app-data-grid>
+    @if (showModal()) {
+
+    <div class="modal-backdrop-custom">
+
+        <div class="modal-content-custom">
+
+            <div class="d-flex justify-content-between mb-3">
+
+                <h4>
+
+                    {{ selectedProduct() ? 'Edit Product' : 'Add Product' }}
+
+                </h4>
+
+                <button class="btn-close" (click)="closeModal()">
+                </button>
+
+            </div>
+
+            <app-product-form [product]="selectedProduct()" (save)="saveProduct($event)" (cancel)="closeModal()">
+
+            </app-product-form>
+
+        </div>
 
     </div>
-
-    } @else {
-
-    <table class="table table-striped">
-
-        <thead>
-
-            <tr>
-
-                <th>Name</th>
-
-                <th>Price</th>
-
-                <th>Stock</th>
-
-                <th>Status</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            @for(product of products(); track product.id){
-
-            <tr>
-
-                <td>{{product.name}}</td>
-
-                <td>{{product.price}}</td>
-
-                <td>{{product.stock}}</td>
-
-                <td>{{product.status}}</td>
-
-            </tr>
-
-            }
-
-        </tbody>
-
-    </table>
 
     }
 

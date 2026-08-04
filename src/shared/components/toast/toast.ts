@@ -6,7 +6,7 @@ import { ToastService } from '../../../core/services/toast.service';
   selector: 'app-toast',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './toast.component.html'
+  templateUrl: './toast.html'
 })
 export class Toast {
 

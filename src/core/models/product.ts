@@ -4,6 +4,6 @@ export interface Product {
     categoryId: number;
     price: number;
     stock: number;
-    status: 'Active' | 'Inactive';
+    status: string;
     createdAt: string;
 }

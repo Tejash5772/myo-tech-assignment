@@ -6,7 +6,7 @@ import { LoadingService } from '../../../core/services/loading.service';
   selector: 'app-loading-spinner',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './loading-spinner.component.html'
+  templateUrl: './loading-spinner.html'
 })
 export class LoadingSpinner {
 
