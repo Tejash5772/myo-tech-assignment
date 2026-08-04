@@ -1,16 +1,28 @@
 import { ValidatorFn } from '@angular/forms';
 
+export type DynamicFieldType =
+    | 'text'
+    | 'number'
+    | 'email'
+    | 'password'
+    | 'textarea'
+    | 'select'
+    | 'checkbox'
+    | 'date';
+
+export interface DynamicFieldOption {
+    label: string;
+    value: string | number | boolean;
+}
+
 export interface DynamicField {
-    type: 'text' | 'number' | 'select' | 'textarea';
+    type: DynamicFieldType;
     name: string;
     label: string;
     placeholder?: string;
-    value?: any;
+    defaultValue?: unknown;
+    disabled?: boolean;
+    hidden?: (formValue: any) => boolean;
     validators?: ValidatorFn[];
-    options?: DynamicOption[];
-}
-
-export interface DynamicOption {
-    label: string;
-    value: any;
+    options?: DynamicFieldOption[];
 }
