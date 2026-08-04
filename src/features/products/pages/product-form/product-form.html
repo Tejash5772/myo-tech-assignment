@@ -16,11 +16,23 @@
 
         <label class="form-label">
 
-            Category Id
+            Category
 
         </label>
 
-        <input class="form-control" type="number" formControlName="categoryId">
+        <select class="form-select" formControlName="categoryId">
+
+            @for (category of categories; track category.id) {
+
+            <option [value]="category.id">
+
+                {{ category.name }}
+
+            </option>
+
+            }
+
+        </select>
 
     </div>
 

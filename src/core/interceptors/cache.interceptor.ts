@@ -1,41 +1,27 @@
 import {
-    HttpInterceptorFn,
+    HttpEvent,
+    HttpHandlerFn,
+    HttpRequest,
     HttpResponse
 } from '@angular/common/http';
 
-import { inject } from '@angular/core';
-import { of, tap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 
-interface CacheEntry {
+const cache = new Map<string, HttpResponse<unknown>>();
 
-    expiry: number;
+export function cacheInterceptor(
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> {
 
-    response: HttpResponse<unknown>;
-
-}
-
-const cache = new Map<string, CacheEntry>();
-
-const TTL = 5 * 60 * 1000;
-
-export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
-
-    if (
-        req.method !== 'GET' ||
-        !req.url.includes('/categories')
-    ) {
+    if (req.method !== 'GET') {
         return next(req);
     }
 
-    const cached = cache.get(req.urlWithParams);
+    const cachedResponse = cache.get(req.urlWithParams);
 
-    if (
-        cached &&
-        cached.expiry > Date.now()
-    ) {
-
-        return of(cached.response.clone());
-
+    if (cachedResponse) {
+        return of(cachedResponse.clone());
     }
 
     return next(req).pipe(
@@ -44,13 +30,10 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
             if (event instanceof HttpResponse) {
 
-                cache.set(req.urlWithParams, {
-
-                    expiry: Date.now() + TTL,
-
-                    response: event.clone()
-
-                });
+                cache.set(
+                    req.urlWithParams,
+                    event.clone()
+                );
 
             }
 
@@ -58,4 +41,4 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
 
     );
 
-};
+}

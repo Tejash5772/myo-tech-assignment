@@ -1,19 +1,31 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import {
+    HttpHandlerFn,
+    HttpRequest
+} from '@angular/common/http';
+
 import { finalize } from 'rxjs';
+
 import { inject } from '@angular/core';
 
 import { LoadingService } from '../services/loading.service';
 
-export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
+export function loadingInterceptor(
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn
+) {
 
-    const loadingService = inject(LoadingService);
+    const loading = inject(LoadingService);
 
-    loadingService.show();
+    loading.show();
 
     return next(req).pipe(
 
-        finalize(() => loadingService.hide())
+        finalize(() => {
+
+            loading.hide();
+
+        })
 
     );
 
-};
+}

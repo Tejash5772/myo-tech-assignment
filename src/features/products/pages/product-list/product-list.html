@@ -69,8 +69,8 @@
 
             </div>
 
-            <app-product-form [product]="selectedProduct()" (save)="saveProduct($event)" (cancel)="closeModal()">
-
+            <app-product-form [product]="selectedProduct()" [categories]="categories()" (save)="saveProduct($event)"
+                (cancel)="closeModal()">
             </app-product-form>
 
         </div>

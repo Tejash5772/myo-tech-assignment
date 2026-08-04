@@ -17,6 +17,7 @@ import {
 } from '@angular/forms';
 
 import { Product } from '../../../../core/models/product';
+import { Category } from '../../../../core/models/category';
 
 @Component({
   selector: 'app-product-form',
@@ -40,6 +41,9 @@ export class ProductForm implements OnChanges {
 
   @Output()
   cancel = new EventEmitter<void>();
+
+  @Input({ required: true })
+  categories: Category[] = [];
 
   readonly form = this.fb.nonNullable.group({
 

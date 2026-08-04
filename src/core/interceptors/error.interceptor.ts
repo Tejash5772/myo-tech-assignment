@@ -1,61 +1,21 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-
 import {
-    catchError,
-    retry,
-    throwError
-} from 'rxjs';
+    HttpErrorResponse,
+    HttpHandlerFn,
+    HttpRequest
+} from '@angular/common/http';
 
-import { ToastService } from '../services/toast.service';
+import { catchError, throwError } from 'rxjs';
 
-export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-
-    const toastService = inject(ToastService);
+export function errorInterceptor(
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn
+) {
 
     return next(req).pipe(
 
-        retry(2),
+        catchError((error: HttpErrorResponse) => {
 
-        catchError(error => {
-
-            switch (error.status) {
-
-                case 401:
-
-                    toastService.show(
-                        'error',
-                        'Unauthorized access.'
-                    );
-
-                    break;
-
-                case 404:
-
-                    toastService.show(
-                        'warning',
-                        'Requested resource not found.'
-                    );
-
-                    break;
-
-                case 500:
-
-                    toastService.show(
-                        'error',
-                        'Internal server error.'
-                    );
-
-                    break;
-
-                default:
-
-                    toastService.show(
-                        'error',
-                        'Something went wrong.'
-                    );
-
-            }
+            alert(error.message);
 
             return throwError(() => error);
 
@@ -63,4 +23,4 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     );
 
-};
+}

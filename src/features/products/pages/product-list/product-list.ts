@@ -35,6 +35,7 @@ import { GridSort } from '../../../../core/models/grid-sort';
 
 import { DataGrid } from '../../../../shared/components/data-grid/data-grid';
 import { ProductForm } from '../product-form/product-form';
+import { Category } from '../../../../core/models/category';
 
 @Component({
   selector: 'app-product-list',
@@ -69,6 +70,8 @@ export class ProductList implements OnInit {
   readonly showModal = signal(false);
 
   readonly selectedProduct = signal<Product | null>(null);
+
+  readonly categories = signal<Category[]>([]);
 
   @ViewChild('actionTemplate', { static: true })
 
@@ -126,6 +129,10 @@ export class ProductList implements OnInit {
       }
 
     ];
+
+    const categories = this.route.snapshot.data['categories'];
+
+    this.categories.set(categories);
 
     this.route.queryParams
       .pipe(

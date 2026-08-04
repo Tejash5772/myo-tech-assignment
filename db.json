@@ -1,12 +1,27 @@
 {
+  "categories": [
+    {
+      "id": 1,
+      "name": "Laptop"
+    },
+    {
+      "id": 2,
+      "name": "Mobile"
+    },
+    {
+      "id": 3,
+      "name": "Accessories"
+    }
+  ],
   "products": [
     {
+      "id": 1,
       "name": "MacBook Pro",
       "categoryId": 1,
       "price": 180000,
-      "stock": 6,
+      "stock": 5,
       "status": "Active",
-      "id": 1
+      "createdAt": "2026-08-03"
     },
     {
       "id": 2,
@@ -25,15 +40,6 @@
       "stock": 3,
       "status": "Inactive",
       "createdAt": "2026-08-03"
-    },
-    {
-      "name": "Niche",
-      "categoryId": 1,
-      "price": 50000,
-      "stock": 3,
-      "status": "Active",
-      "createdAt": "2026-08-04",
-      "id": 4
     }
   ]
 }

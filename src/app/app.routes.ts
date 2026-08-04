@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { categoriesResolver } from '../features/products/resolvers/categories.resolver';
+import { ProductList } from '../features/products/pages/product-list/product-list';
 
 export const routes: Routes = [
 
@@ -7,14 +9,13 @@ export const routes: Routes = [
     redirectTo: 'products',
     pathMatch: 'full'
   },
-
   {
     path: 'products',
-    loadComponent: () =>
-      import('../features/products/pages/product-list/product-list')
-        .then(m => m.ProductList)
+    component: ProductList,
+    resolve: {
+      categories: categoriesResolver
+    }
   },
-
   {
     path: '**',
     redirectTo: 'products'
