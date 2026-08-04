@@ -1,15 +1,23 @@
-:host {
-    display: block;
-}
-
-form {
-    max-width: 600px;
-}
-
 .form-label {
+
     font-weight: 600;
+
 }
 
 .text-danger {
-    font-size: 0.85rem;
+
+    font-size: .85rem;
+
+}
+
+.form-check {
+
+    margin-top: .5rem;
+
+}
+
+button {
+
+    min-width: 120px;
+
 }

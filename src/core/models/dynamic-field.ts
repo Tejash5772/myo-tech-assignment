@@ -20,9 +20,9 @@ export interface DynamicField {
     name: string;
     label: string;
     placeholder?: string;
-    defaultValue?: unknown;
+    value?: unknown;
     disabled?: boolean;
-    hidden?: (formValue: any) => boolean;
     validators?: ValidatorFn[];
     options?: DynamicFieldOption[];
+    hidden?: (formValue: Record<string, unknown>) => boolean;
 }

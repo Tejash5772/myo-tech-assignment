@@ -2,8 +2,9 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnInit,
+  OnChanges,
   Output,
+  SimpleChanges,
   inject
 } from '@angular/core';
 
@@ -15,6 +16,7 @@ import {
   FormGroup,
   ReactiveFormsModule
 } from '@angular/forms';
+
 import { DynamicField } from '../../../core/models/dynamic-field';
 
 @Component({
@@ -27,21 +29,38 @@ import { DynamicField } from '../../../core/models/dynamic-field';
   templateUrl: './dynamic-form.html',
   styleUrl: './dynamic-form.scss'
 })
-export class DynamicForm implements OnInit {
+export class DynamicForm implements OnChanges {
 
   private readonly fb = inject(FormBuilder);
 
   @Input({ required: true })
-
   fields: DynamicField[] = [];
 
+  @Input()
+  value: Record<string, unknown> | null = null;
+
   @Output()
+  submitForm = new EventEmitter<Record<string, unknown>>();
 
-  submitForm = new EventEmitter<any>();
+  form: FormGroup = this.fb.group({});
 
-  form!: FormGroup;
+  ngOnChanges(changes: SimpleChanges): void {
 
-  ngOnInit(): void {
+    if (changes['fields']) {
+
+      this.buildForm();
+
+    }
+
+    if (changes['value'] && this.value) {
+
+      this.form.patchValue(this.value);
+
+    }
+
+  }
+
+  private buildForm(): void {
 
     const controls: Record<string, FormControl> = {};
 
@@ -49,7 +68,10 @@ export class DynamicForm implements OnInit {
 
       controls[field.name] = new FormControl(
 
-        field.value ?? null,
+        {
+          value: field.value ?? null,
+          disabled: field.disabled ?? false
+        },
 
         field.validators ?? []
 

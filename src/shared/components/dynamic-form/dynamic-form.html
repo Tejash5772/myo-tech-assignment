@@ -2,7 +2,11 @@
 
     @for (field of fields; track field.name) {
 
+    @if (!(field.hidden?.(form.getRawValue()) ?? false)) {
+
     <div class="mb-3">
+
+        @if (field.type !== 'checkbox') {
 
         <label class="form-label">
 
@@ -10,11 +14,26 @@
 
         </label>
 
+        }
+
         @switch (field.type) {
 
         @case ('text') {
 
         <input class="form-control" type="text" [placeholder]="field.placeholder ?? ''" [formControlName]="field.name">
+
+        }
+
+        @case ('email') {
+
+        <input class="form-control" type="email" [placeholder]="field.placeholder ?? ''" [formControlName]="field.name">
+
+        }
+
+        @case ('password') {
+
+        <input class="form-control" type="password" [placeholder]="field.placeholder ?? ''"
+            [formControlName]="field.name">
 
         }
 
@@ -25,10 +44,16 @@
 
         }
 
+        @case ('date') {
+
+        <input class="form-control" type="date" [formControlName]="field.name">
+
+        }
+
         @case ('textarea') {
 
         <textarea class="form-control" rows="3" [placeholder]="field.placeholder ?? ''" [formControlName]="field.name">
-          </textarea>
+            </textarea>
 
         }
 
@@ -50,6 +75,22 @@
 
         }
 
+        @case ('checkbox') {
+
+        <div class="form-check">
+
+            <input class="form-check-input" type="checkbox" [formControlName]="field.name">
+
+            <label class="form-check-label">
+
+                {{ field.label }}
+
+            </label>
+
+        </div>
+
+        }
+
         }
 
         @if (form.get(field.name)?.invalid &&
@@ -57,7 +98,24 @@
 
         <div class="text-danger mt-1">
 
+            @if (form.get(field.name)?.errors?.['required']) {
+
             {{ field.label }} is required.
+
+            }
+
+            @if (form.get(field.name)?.errors?.['email']) {
+
+            Please enter a valid email.
+
+            }
+
+            @if (form.get(field.name)?.errors?.['min']) {
+
+            Minimum value is
+            {{ form.get(field.name)?.errors?.['min'].min }}.
+
+            }
 
         </div>
 
@@ -67,9 +125,11 @@
 
     }
 
+    }
+
     <div class="text-end">
 
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
 
             Submit
 
