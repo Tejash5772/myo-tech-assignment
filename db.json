@@ -1,4 +1,25 @@
 {
+  "orders": [
+    {
+      "id": 1,
+      "customerName": "John Doe",
+      "orderDate": "2026-08-04",
+      "status": "Pending",
+      "totalAmount": 250000,
+      "items": [
+        {
+          "productId": 1,
+          "quantity": 1,
+          "price": 180000
+        },
+        {
+          "productId": 2,
+          "quantity": 1,
+          "price": 70000
+        }
+      ]
+    }
+  ],
   "categories": [
     {
       "id": 1,
@@ -24,13 +45,12 @@
       "createdAt": "2026-08-03"
     },
     {
-      "id": 2,
       "name": "iPhone 17",
       "categoryId": 2,
       "price": 120000,
       "stock": 10,
       "status": "Active",
-      "createdAt": "2026-08-03"
+      "id": 2
     },
     {
       "id": 3,
@@ -40,15 +60,6 @@
       "stock": 3,
       "status": "Inactive",
       "createdAt": "2026-08-03"
-    },
-    {
-      "name": "huy",
-      "categoryId": "2",
-      "price": 6000,
-      "stock": 45,
-      "status": "Active",
-      "createdAt": "2026-08-04",
-      "id": 4
     }
   ]
 }

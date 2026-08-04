@@ -1,16 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+export type ToastType =
+    | 'success'
+    | 'error'
+    | 'warning'
+    | 'info';
 
-export interface Toast {
-
-    id: number;
-
-    type: ToastType;
+export interface ToastMessage {
 
     message: string;
 
-    duration?: number;
+    type: ToastType;
 
 }
 
@@ -19,41 +19,74 @@ export interface Toast {
 })
 export class ToastService {
 
-    readonly toasts = signal<Toast[]>([]);
+    readonly toast = signal<ToastMessage | null>(null);
+
+    private readonly duration = 3000;
 
     show(
-        type: ToastType,
         message: string,
-        duration = 5000
+        type: ToastType = 'info'
     ): void {
 
-        const toast: Toast = {
-
-            id: Date.now(),
-
-            type,
+        this.toast.set({
 
             message,
 
-            duration
+            type
 
-        };
-
-        this.toasts.update(value => [...value, toast]);
+        });
 
         setTimeout(() => {
 
-            this.remove(toast.id);
+            this.clear();
 
-        }, duration);
+        }, this.duration);
 
     }
 
-    remove(id: number): void {
+    success(message: string): void {
 
-        this.toasts.update(value =>
+        this.show(
 
-            value.filter(x => x.id !== id)
+            message,
+
+            'success'
+
+        );
+
+    }
+
+    error(message: string): void {
+
+        this.show(
+
+            message,
+
+            'error'
+
+        );
+
+    }
+
+    warning(message: string): void {
+
+        this.show(
+
+            message,
+
+            'warning'
+
+        );
+
+    }
+
+    info(message: string): void {
+
+        this.show(
+
+            message,
+
+            'info'
 
         );
 
@@ -61,7 +94,7 @@ export class ToastService {
 
     clear(): void {
 
-        this.toasts.set([]);
+        this.toast.set(null);
 
     }
 

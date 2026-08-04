@@ -5,7 +5,11 @@ import {
     HttpResponse
 } from '@angular/common/http';
 
-import { Observable, of, tap } from 'rxjs';
+import {
+    Observable,
+    of,
+    tap
+} from 'rxjs';
 
 const cache = new Map<string, HttpResponse<unknown>>();
 
@@ -15,13 +19,17 @@ export function cacheInterceptor(
 ): Observable<HttpEvent<unknown>> {
 
     if (req.method !== 'GET') {
+
         return next(req);
+
     }
 
     const cachedResponse = cache.get(req.urlWithParams);
 
     if (cachedResponse) {
+
         return of(cachedResponse.clone());
+
     }
 
     return next(req).pipe(
@@ -30,10 +38,7 @@ export function cacheInterceptor(
 
             if (event instanceof HttpResponse) {
 
-                cache.set(
-                    req.urlWithParams,
-                    event.clone()
-                );
+                cache.set(req.urlWithParams, event.clone());
 
             }
 
