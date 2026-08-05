@@ -335,12 +335,9 @@ export class OrdersForm implements OnInit {
 
     const payload = {
 
-      customer: {
-        name: formValue.customer?.name ?? '',
-        email: formValue.customer?.email ?? '',
-        phone: formValue.customer?.phone ?? ''
-      },
-
+      name: formValue.customer?.name ?? '',
+      email: formValue.customer?.email ?? '',
+      phone: formValue.customer?.phone ?? '',
       items: items.map(item => ({
         productId: Number(item.productId),
         quantity: Number(item.quantity),

@@ -28,7 +28,7 @@
     width: 100%;
     min-height: 170px;
 
-    border: 2px dashed #999;
+    border: 2px dashed var(--bs-border-color);
     border-radius: 10px;
 
     display: flex;
@@ -43,19 +43,19 @@
 
 .upload-content:hover,
 .file-upload.dragging .upload-content {
-    border-color: #0d6efd;
-    background: #f8fbff;
+    border-color: var(--bs-primary);
+    background: var(--bs-body-color);
 }
 
 .upload-text {
     font-size: 18px;
-    color: #222;
+    color: var(--app-text);
 }
 
 .preview-container {
     width: 100%;
 
-    border: 1px solid #ddd;
+    border: 1px solid var(--bs-border-color);
     border-radius: 10px;
 
     padding: 15px;
@@ -65,6 +65,8 @@
     align-items: center;
 
     gap: 15px;
+
+    background: var(--bs-body-bg);
 }
 
 .image-preview {
@@ -72,7 +74,6 @@
     max-height: 300px;
 
     object-fit: contain;
-
     border-radius: 8px;
 }
 

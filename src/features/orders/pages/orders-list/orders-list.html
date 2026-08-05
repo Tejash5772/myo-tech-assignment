@@ -45,6 +45,25 @@
     }
 
 
+    <!-- =====================================================
+         ACTION TEMPLATE
+    ====================================================== -->
+
+    <ng-template #actionTemplate let-row>
+
+        <button type="button" class="btn btn-sm btn-danger" (click)="deleteOrder(row); $event.stopPropagation()">
+
+            Delete
+
+        </button>
+
+    </ng-template>
+
+
+    <!-- =====================================================
+         DATA GRID
+    ====================================================== -->
+
     <app-data-grid [rows]="orders" [columns]="columns" [loading]="loading" [page]="page" [pageSize]="pageSize"
         [totalRecords]="totalRecords" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
         (sortChange)="onSortChange($event)" (rowClick)="onRowClick($event)" />

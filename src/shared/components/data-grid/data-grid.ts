@@ -57,7 +57,7 @@ export class DataGrid {
   totalRecords = 0;
 
   @Input()
-searchTerm = '';
+  searchTerm = '';
 
   @Output()
   pageChange = new EventEmitter<number>();
