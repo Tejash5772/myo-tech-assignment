@@ -18,6 +18,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: angular-assignment
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,19 +30,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: angular-assignment/package-lock.json
 
       - name: Install dependencies
-        working-directory: angular-assignment
         run: npm ci
 
       - name: Build Angular application
-        working-directory: angular-assignment
         run: npm run build -- --base-href "/myo-tech-assignment/"
 
       - name: Fix Angular routing for GitHub Pages
-        run: cp angular-assignment/dist/angular-assignment/browser/index.html angular-assignment/dist/angular-assignment/browser/404.html
+        run: |
+          cp dist/angular-assignment/browser/index.html dist/angular-assignment/browser/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
