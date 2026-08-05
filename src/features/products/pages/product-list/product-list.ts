@@ -355,65 +355,27 @@ export class ProductList implements OnInit, CanComponentDeactivate {
     this.loading.set(true);
 
     const request = this.selectedProduct()
-
       ? this.productService.update(
         this.selectedProduct()!.id,
         product
       )
-
       : this.productService.create({
-
         ...product,
-
-        createdAt: new Date()
-          .toISOString()
-          .split('T')[0]
-
+        createdAt: new Date().toISOString()
       });
 
     request
       .pipe(
-
-        finalize(() => {
-
-          this.loading.set(false);
-
-        }),
-
         takeUntilDestroyed(this.destroyRef)
-
       )
       .subscribe({
 
-        next: (savedProduct: Product) => {
-
-          if (this.selectedProduct()) {
-
-            // Update existing product
-            this.products.update(products =>
-              products.map(product =>
-                product.id === savedProduct.id
-                  ? savedProduct
-                  : product
-              )
-            );
-
-          } else {
-
-            // Add new product
-            this.products.update(products => [
-              savedProduct,
-              ...products
-            ]);
-
-            this.totalRecords.update(total => total + 1);
-
-          }
+        next: () => {
 
           const isEdit = !!this.selectedProduct();
 
+          // Close modal
           this.selectedProduct.set(null);
-
           this.showModal.set(false);
 
           this.toastService.success(
@@ -422,20 +384,23 @@ export class ProductList implements OnInit, CanComponentDeactivate {
               : 'Product created successfully.'
           );
 
+          // IMPORTANT:
+          // Reload the current paginated data.
+          // Do NOT push the new product into `products`.
+          this.loadProducts();
         },
 
         error: () => {
 
+          this.loading.set(false);
+
           this.toastService.error(
-
             'Failed to save product.'
-
           );
 
         }
 
       });
-
   }
 
   async deleteProduct(product: Product): Promise<void> {
@@ -553,7 +518,7 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
   }
 
-  private getExportData(): Array<{
+  private getExportData(products: Product[]): Array<{
     ID: number;
     Name: string;
     Category: string;
@@ -563,8 +528,7 @@ export class ProductList implements OnInit, CanComponentDeactivate {
     CreatedAt: string;
   }> {
 
-    return this.products().map(product => ({
-
+    return products.map(product => ({
       ID: product.id,
 
       Name: product.name,
@@ -580,34 +544,72 @@ export class ProductList implements OnInit, CanComponentDeactivate {
       Status: product.status,
 
       CreatedAt: product.createdAt
-
     }));
 
   }
 
   exportProducts(): void {
 
-    this.exportService.exportToCsv(
+    this.productService.getAll()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
 
-      'products',
+        next: allProducts => {
 
-      this.getExportData()
+          const exportData =
+            this.getExportData(allProducts);
 
-    );
+          this.exportService.exportToCsv(
+            'products',
+            exportData
+          );
+
+        },
+
+        error: () => {
+
+          this.toastService.error(
+            'Failed to export products.'
+          );
+
+        }
+
+      });
 
   }
 
   exportProductsPdf(): void {
 
-    this.pdfExportService.exportToPdf(
+    this.productService.getAll()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
 
-      'products',
+        next: allProducts => {
 
-      'Products Report',
+          const exportData =
+            this.getExportData(allProducts);
 
-      this.getExportData()
+          this.pdfExportService.exportToPdf(
+            'products',
+            'Products Report',
+            exportData
+          );
 
-    );
+        },
+
+        error: () => {
+
+          this.toastService.error(
+            'Failed to export products.'
+          );
+
+        }
+
+      });
 
   }
 

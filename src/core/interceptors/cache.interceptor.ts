@@ -16,18 +16,23 @@ interface CacheEntry {
 
 const cache = new Map<string, CacheEntry>();
 
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 5 * 60 * 1000;
 
 export const cacheInterceptor: HttpInterceptorFn = (
     req: HttpRequest<unknown>,
     next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
 
+    // Any data-changing request invalidates cached GET responses
     if (req.method !== 'GET') {
+
+        cache.clear();
+
         return next(req);
     }
 
     const key = req.urlWithParams;
+
     const cached = cache.get(key);
 
     if (cached && cached.expiry > Date.now()) {
@@ -45,11 +50,8 @@ export const cacheInterceptor: HttpInterceptorFn = (
             if (event instanceof HttpResponse) {
 
                 cache.set(key, {
-
                     response: event.clone(),
-
                     expiry: Date.now() + CACHE_TTL
-
                 });
 
             }
@@ -57,5 +59,4 @@ export const cacheInterceptor: HttpInterceptorFn = (
         })
 
     );
-
 };

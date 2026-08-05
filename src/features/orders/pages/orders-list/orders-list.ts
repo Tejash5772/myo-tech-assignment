@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectorRef,
   Component,
   inject,
   OnDestroy,
   OnInit
 } from '@angular/core';
 
-import { NavigationEnd, Router } from '@angular/router';
-import { Subject, filter, takeUntil } from 'rxjs';
+import { Router } from '@angular/router';
+import { Subject, finalize, takeUntil } from 'rxjs';
 
 import { OrderService } from '../../services/order.service';
 import { Order } from '../../../../core/models/order';
@@ -30,24 +31,19 @@ export class OrdersList implements OnInit, OnDestroy {
 
   private readonly orderService = inject(OrderService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   private readonly destroy$ = new Subject<void>();
 
-  // All records from API
   private allOrders: Order[] = [];
 
-  // Current page records shown in DataGrid
   orders: Order[] = [];
 
   loading = false;
   errorMessage = '';
 
   page = 1;
-
-  // Default page size
   pageSize = 5;
-
-  // Total number of records
   totalRecords = 0;
 
   columns: GridColumn[] = [
@@ -84,26 +80,7 @@ export class OrdersList implements OnInit, OnDestroy {
   sortState: GridSort | null = null;
 
   ngOnInit(): void {
-
     this.loadOrders();
-
-    this.router.events
-      .pipe(
-        filter(
-          event => event instanceof NavigationEnd
-        ),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
-
-        if (this.router.url === '/orders') {
-
-          this.page = 1;
-
-          this.loadOrders();
-        }
-
-      });
   }
 
   loadOrders(): void {
@@ -111,49 +88,78 @@ export class OrdersList implements OnInit, OnDestroy {
     this.loading = true;
     this.errorMessage = '';
 
-    // Get ALL orders.
-    // Do NOT send _page / _limit here.
-    this.orderService.getAll().subscribe({
+    // Immediately update the UI to show skeleton
+    this.cdr.detectChanges();
 
-      next: orders => {
+    this.orderService
+      .getAll()
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
 
-        console.log(
-          'Orders API response:',
-          orders
-        );
+          this.loading = false;
 
-        this.allOrders = Array.isArray(orders)
-          ? orders
-          : [];
+          // IMPORTANT:
+          // Tell Angular to update DataGrid
+          this.cdr.detectChanges();
 
-        this.totalRecords =
-          this.allOrders.length;
+        })
+      )
+      .subscribe({
 
-        this.applySorting();
-        this.applyPagination();
+        next: orders => {
 
-        this.loading = false;
+          console.log(
+            'Orders API response:',
+            orders
+          );
 
-      },
+          this.allOrders = Array.isArray(orders)
+            ? orders
+            : [];
 
-      error: error => {
+          this.totalRecords =
+            this.allOrders.length;
 
-        console.error(
-          'Failed to load orders:',
-          error
-        );
+          this.applySorting();
+          this.applyPagination();
 
-        this.allOrders = [];
-        this.orders = [];
+          console.log(
+            'Orders loaded:',
+            {
+              totalRecords: this.totalRecords,
+              page: this.page,
+              pageSize: this.pageSize,
+              visibleRecords: this.orders.length,
+              loading: this.loading
+            }
+          );
 
-        this.totalRecords = 0;
+          // Update parent + DataGrid immediately
+          this.cdr.detectChanges();
+        },
 
-        this.errorMessage =
-          'Unable to load orders.';
+        error: error => {
 
-        this.loading = false;
-      }
-    });
+          console.error(
+            'Failed to load orders:',
+            error
+          );
+
+          this.allOrders = [];
+          this.orders = [];
+
+          this.totalRecords = 0;
+
+          this.errorMessage =
+            'Unable to load orders.';
+
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        }
+
+      });
   }
 
   private applyPagination(): void {
@@ -216,25 +222,29 @@ export class OrdersList implements OnInit, OnDestroy {
     this.page = page;
 
     this.applyPagination();
+
+    this.cdr.detectChanges();
   }
 
   onPageSizeChange(size: number): void {
 
     this.pageSize = size;
-
     this.page = 1;
 
     this.applyPagination();
+
+    this.cdr.detectChanges();
   }
 
   onSortChange(sort: GridSort): void {
 
     this.sortState = sort;
-
     this.page = 1;
 
     this.applySorting();
     this.applyPagination();
+
+    this.cdr.detectChanges();
   }
 
   onRowClick(order: Order): void {

@@ -51,7 +51,7 @@ export class DataGrid {
   page = 1;
 
   @Input()
-  pageSize = 10;
+  pageSize = 5;
 
   @Input()
   totalRecords = 0;
