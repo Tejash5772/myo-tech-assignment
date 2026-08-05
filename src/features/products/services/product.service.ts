@@ -50,5 +50,6 @@ export class ProductService extends BaseApiService<Product> {
     );
 
   }
+  
 
 }

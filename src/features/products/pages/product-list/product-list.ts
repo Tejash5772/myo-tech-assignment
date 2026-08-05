@@ -22,7 +22,9 @@ import {
   distinctUntilChanged,
   switchMap,
   tap,
-  finalize
+  finalize,
+  Subscription,
+  timer
 } from 'rxjs';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -69,6 +71,14 @@ export class ProductList implements OnInit, CanComponentDeactivate {
   private readonly exportService = inject(ExportService);
   private readonly pdfExportService = inject(PdfExportService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly pendingDeletes = new Map<
+    number,
+    {
+      product: Product;
+      index: number;
+      timer: Subscription;
+    }
+  >();
 
   readonly products = signal<Product[]>([]);
   readonly loading = signal(false);
@@ -419,46 +429,98 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
     }
 
-    this.loading.set(true);
+    const currentProducts = [...this.products()];
 
-    this.productService
-      .delete(product.id)
-      .pipe(
+    const index = currentProducts.findIndex(
+      p => p.id === product.id
+    );
 
-        finalize(() => {
+    if (index === -1) {
+      return;
+    }
 
-          this.loading.set(false);
+    // Optimistic UI
+    currentProducts.splice(index, 1);
 
-        }),
+    this.products.set(currentProducts);
 
-        takeUntilDestroyed(this.destroyRef)
+    // Delay actual delete
+    const deleteTimer = timer(5000).subscribe(() => {
 
-      )
-      .subscribe({
+      this.productService
+        .delete(product.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
 
-        next: () => {
+          next: () => {
 
-          this.loadProducts();
+            this.pendingDeletes.delete(product.id);
 
-          this.toastService.success(
+            this.toastService.success(
+              'Product deleted successfully.'
+            );
 
-            'Product deleted successfully.'
+          },
 
+          error: () => {
+
+            const restored = [...this.products()];
+
+            restored.splice(index, 0, product);
+
+            this.products.set(restored);
+
+            this.pendingDeletes.delete(product.id);
+
+            this.toastService.error(
+              'Failed to delete product.'
+            );
+
+          }
+
+        });
+
+    });
+
+    this.pendingDeletes.set(product.id, {
+      product,
+      index,
+      timer: deleteTimer
+    });
+
+    this.toastService.warning(
+      `"${product.name}" removed.`,
+      {
+        label: 'Undo',
+        callback: () => {
+
+          const pending = this.pendingDeletes.get(product.id);
+
+          if (!pending) {
+            return;
+          }
+
+          pending.timer.unsubscribe();
+
+          const restored = [...this.products()];
+
+          restored.splice(
+            pending.index,
+            0,
+            pending.product
           );
 
-        },
+          this.products.set(restored);
 
-        error: () => {
+          this.pendingDeletes.delete(product.id);
 
-          this.toastService.error(
-
-            'Failed to delete product.'
-
+          this.toastService.info(
+            'Delete cancelled.'
           );
 
         }
-
-      });
+      }
+    );
 
   }
 

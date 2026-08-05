@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Toast } from '../shared/components/toast/toast';
 import { LoadingSpinner } from '../shared/components/loading-spinner/loading-spinner';
 import { ConfirmDialog } from '../shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
 import { ThemeToggle } from '../shared/components/theme-toggle/theme-toggle/theme-toggle';
+import { Toast } from '../shared/components/toast/toast';
 
 @Component({
   selector: 'app-root',

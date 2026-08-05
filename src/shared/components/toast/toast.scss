@@ -8,8 +8,9 @@
     border-radius: 8px;
     color: #fff;
     box-shadow: 0 6px 18px rgba(0, 0, 0, .2);
-    z-index: 9999;
+    z-index: 9999 !important;
     animation: slideIn .25s ease;
+    pointer-events: auto;
 }
 
 .toast-content {
