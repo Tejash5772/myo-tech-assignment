@@ -37,7 +37,7 @@ jobs:
         run: npm ci
 
       - name: Build Angular application
-        run: npm run build -- --base-href "/angular-assignment/"
+        run: npm run build -- --base-href "/myo-tech-assignment/"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
