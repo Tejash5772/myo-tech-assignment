@@ -6,11 +6,21 @@ export type ToastType =
     | 'warning'
     | 'info';
 
-export interface ToastMessage {
+export interface ToastAction {
+
+    label: string;
+
+    callback: () => void;
+
+}
+
+export interface Toast {
 
     message: string;
 
     type: ToastType;
+
+    action?: ToastAction;
 
 }
 
@@ -19,38 +29,53 @@ export interface ToastMessage {
 })
 export class ToastService {
 
-    readonly toast = signal<ToastMessage | null>(null);
+    readonly toast = signal<Toast | null>(null);
 
-    private readonly duration = 3000;
+    private timeoutId?: number;
 
     show(
         message: string,
-        type: ToastType = 'info'
+        type: ToastType = 'info',
+        action?: ToastAction,
+        duration = 5000
     ): void {
+
+        if (this.timeoutId) {
+
+            clearTimeout(this.timeoutId);
+
+        }
 
         this.toast.set({
 
             message,
 
-            type
+            type,
+
+            action
 
         });
 
-        setTimeout(() => {
+        this.timeoutId = window.setTimeout(() => {
 
             this.clear();
 
-        }, this.duration);
+        }, duration);
 
     }
 
-    success(message: string): void {
+    success(
+        message: string,
+        action?: ToastAction
+    ): void {
 
         this.show(
 
             message,
 
-            'success'
+            'success',
+
+            action
 
         );
 
@@ -93,6 +118,12 @@ export class ToastService {
     }
 
     clear(): void {
+
+        if (this.timeoutId) {
+
+            clearTimeout(this.timeoutId);
+
+        }
 
         this.toast.set(null);
 

@@ -1,14 +1,22 @@
 .toast-container {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
-    z-index: 9999;
-    min-width: 280px;
+    min-width: 320px;
+    max-width: 420px;
     padding: 14px 18px;
     border-radius: 8px;
     color: #fff;
-    font-weight: 500;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .2);
+    z-index: 9999;
+    animation: slideIn .25s ease;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
 .success {
@@ -25,4 +33,25 @@
 
 .info {
     background: #0d6efd;
+}
+
+.toast-content button {
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.toast-content button:hover {
+    text-decoration: underline;
+}
+
+@keyframes slideIn {
+    from {
+       transform: translateX(100%);
+       opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }

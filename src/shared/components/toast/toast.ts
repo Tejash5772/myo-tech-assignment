@@ -15,6 +15,6 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class Toast {
 
-  readonly toast = inject(ToastService).toast;
+  readonly toastService = inject(ToastService);
 
 }

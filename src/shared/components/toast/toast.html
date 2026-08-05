@@ -1,9 +1,28 @@
-@if (toast()) {
+@if (toastService.toast(); as toast) {
 
-<div class="toast-container" [class.success]="toast()!.type === 'success'" [class.error]="toast()!.type === 'error'"
-    [class.warning]="toast()!.type === 'warning'" [class.info]="toast()!.type === 'info'">
+<div class="toast-container" [class.success]="toast.type === 'success'" [class.error]="toast.type === 'error'"
+    [class.warning]="toast.type === 'warning'" [class.info]="toast.type === 'info'">
 
-    {{ toast()!.message }}
+    <div class="toast-content">
+
+        <span>
+
+            {{ toast.message }}
+
+        </span>
+
+        @if (toast.action) {
+
+        <button type="button" class="btn btn-link btn-sm text-white p-0"
+            (click)="toast.action.callback(); toastService.clear()">
+
+            {{ toast.action.label }}
+
+        </button>
+
+        }
+
+    </div>
 
 </div>
 
