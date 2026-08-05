@@ -65,5 +65,98 @@
       "image": null,
       "createdAt": "2026-08-03"
     }
+  ],
+  "dynamic-schema": [
+    {
+      "key": "productName",
+      "control": "textbox",
+      "label": "Product Name",
+      "required": true,
+      "placeholder": "Enter product name"
+    },
+    {
+      "key": "category",
+      "control": "dropdown",
+      "label": "Category",
+      "api": "/api/categories",
+      "required": true
+    },
+    {
+      "key": "subCategory",
+      "control": "dropdown",
+      "label": "Sub Category",
+      "dependsOn": "category",
+      "required": false,
+      "dependentOptions": {
+        "1": [
+          {
+            "label": "Ultrabook",
+            "value": "Ultrabook"
+          },
+          {
+            "label": "Gaming Laptop",
+            "value": "Gaming Laptop"
+          }
+        ],
+        "2": [
+          {
+            "label": "Android",
+            "value": "Android"
+          },
+          {
+            "label": "iOS",
+            "value": "iOS"
+          }
+        ],
+        "3": [
+          {
+            "label": "Mouse",
+            "value": "Mouse"
+          },
+          {
+            "label": "Keyboard",
+            "value": "Keyboard"
+          }
+        ]
+      }
+    },
+    {
+      "key": "price",
+      "control": "number",
+      "label": "Price (INR)",
+      "required": true,
+      "min": 1
+    },
+    {
+      "key": "status",
+      "control": "dropdown",
+      "label": "Status",
+      "required": true,
+      "dependentOptions": {
+        "": [
+          {
+            "label": "Active",
+            "value": "Active"
+          },
+          {
+            "label": "Inactive",
+            "value": "Inactive"
+          }
+        ]
+      }
+    },
+    {
+      "key": "inactiveReason",
+      "control": "textarea",
+      "label": "Inactive Reason",
+      "requiredWhen": {
+        "field": "status",
+        "equals": "Inactive"
+      },
+      "hiddenWhen": {
+        "field": "status",
+        "equals": "Active"
+      }
+    }
   ]
 }
