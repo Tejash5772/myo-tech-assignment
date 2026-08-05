@@ -25,7 +25,6 @@
         </div>
 
     </div>
-
     <div class="row mb-3">
 
         <div class="col-md-4">
@@ -36,6 +35,10 @@
         </div>
 
     </div>
+
+
+    <app-predicate-filter [fields]="filterFields" (apply)="onFilterApply($event)" (clear)="onFilterClear()">
+    </app-predicate-filter>
 
     <!-- Image Template -->
     <ng-template #imageTemplate let-row>

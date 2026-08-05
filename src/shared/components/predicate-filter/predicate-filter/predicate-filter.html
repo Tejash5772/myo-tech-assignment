@@ -1,0 +1,284 @@
+<div class="predicate-filter">
+
+    <div class="filter-header">
+
+        <div>
+            <h5 class="mb-1">
+                Predicate Filter
+            </h5>
+
+            <small class="text-muted">
+                Build nested AND / OR conditions
+            </small>
+        </div>
+
+        <div class="logic-control">
+
+            <label>
+                Match
+            </label>
+
+            <select class="form-select form-select-sm" [(ngModel)]="filter.logic">
+
+                <option value="AND">
+                    ALL conditions (AND)
+                </option>
+
+                <option value="OR">
+                    ANY condition (OR)
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- ROOT GROUP -->
+
+    <div class="filter-group root-group">
+
+        @for (
+        condition of filter.conditions;
+        track $index
+        ) {
+
+        <div class="condition-row">
+
+            <select class="form-select" [(ngModel)]="condition.field" (ngModelChange)="changeField(condition)">
+
+                @for (
+                field of fields;
+                track field.field
+                ) {
+
+                <option [value]="field.field">
+                    {{ field.label }}
+                </option>
+
+                }
+
+            </select>
+
+
+            <select class="form-select" [(ngModel)]="condition.operator">
+
+                @for (
+                operator of operators;
+                track operator.value
+                ) {
+
+                <option [value]="operator.value">
+                    {{ operator.label }}
+                </option>
+
+                }
+
+            </select>
+
+
+            @if (
+            getField(condition.field)?.type === 'select'
+            ) {
+
+            <select class="form-select" [(ngModel)]="condition.value">
+
+                @for (
+                option of getField(condition.field)?.options ?? [];
+                track option.value
+                ) {
+
+                <option [ngValue]="option.value">
+                    {{ option.label }}
+                </option>
+
+                }
+
+            </select>
+
+            } @else {
+
+            <input class="form-control" [type]="
+                            getField(condition.field)?.type === 'number'
+                                ? 'number'
+                                : 'text'
+                        " [(ngModel)]="condition.value" placeholder="Value">
+
+            }
+
+
+            <button type="button" class="btn btn-outline-danger" (click)="removeCondition(filter, $index)">
+
+                ×
+
+            </button>
+
+        </div>
+
+        }
+
+
+        <!-- NESTED GROUPS -->
+
+        @for (
+        group of filter.groups;
+        track $index
+        ) {
+
+        <div class="nested-group">
+
+            <div class="nested-group-header">
+
+                <strong>
+                    Group {{ $index + 1 }}
+                </strong>
+
+                <select class="form-select form-select-sm" [(ngModel)]="group.logic">
+
+                    <option value="AND">
+                        AND
+                    </option>
+
+                    <option value="OR">
+                        OR
+                    </option>
+
+                </select>
+
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeGroup(filter, $index)">
+
+                    Remove Group
+
+                </button>
+
+            </div>
+
+
+            @for (
+            condition of group.conditions;
+            track $index
+            ) {
+
+            <div class="condition-row">
+
+                <select class="form-select" [(ngModel)]="condition.field" (ngModelChange)="changeField(condition)">
+
+                    @for (
+                    field of fields;
+                    track field.field
+                    ) {
+
+                    <option [value]="field.field">
+                        {{ field.label }}
+                    </option>
+
+                    }
+
+                </select>
+
+
+                <select class="form-select" [(ngModel)]="condition.operator">
+
+                    @for (
+                    operator of operators;
+                    track operator.value
+                    ) {
+
+                    <option [value]="operator.value">
+                        {{ operator.label }}
+                    </option>
+
+                    }
+
+                </select>
+
+
+                @if (
+                getField(condition.field)?.type === 'select'
+                ) {
+
+                <select class="form-select" [(ngModel)]="condition.value">
+
+                    @for (
+                    option of getField(condition.field)?.options ?? [];
+                    track option.value
+                    ) {
+
+                    <option [ngValue]="option.value">
+                        {{ option.label }}
+                    </option>
+
+                    }
+
+                </select>
+
+                } @else {
+
+                <input class="form-control" [type]="
+                                    getField(condition.field)?.type === 'number'
+                                        ? 'number'
+                                        : 'text'
+                                " [(ngModel)]="condition.value" placeholder="Value">
+
+                }
+
+
+                <button type="button" class="btn btn-outline-danger" (click)="removeCondition(group, $index)">
+
+                    ×
+
+                </button>
+
+            </div>
+
+            }
+
+
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCondition(group)">
+
+                + Condition
+
+            </button>
+
+        </div>
+
+        }
+
+
+        <div class="filter-actions">
+
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCondition()">
+
+                + Condition
+
+            </button>
+
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addGroup()">
+
+                + Group
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="filter-footer">
+
+        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+
+            Clear
+
+        </button>
+
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">
+
+            Apply Filters
+
+        </button>
+
+    </div>
+
+</div>

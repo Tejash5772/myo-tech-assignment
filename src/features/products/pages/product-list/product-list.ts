@@ -47,6 +47,9 @@ import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.s
 import { CanComponentDeactivate } from '../../../../core/models/can-component-deactivate';
 import { DebounceClickDirective } from '../../../../shared/directives/debounce-click.directive';
 import { PermissionDirective } from '../../../../shared/directives/permission.directive';
+import { FilterField, PredicateFilter } from '../../../../shared/components/predicate-filter/predicate-filter/predicate-filter';
+import { PredicateFilterService } from '../../../../core/services/predicate-filter.service';
+import { FilterCondition, FilterGroup } from '../../../../core/models/predicate-filter';
 
 @Component({
   selector: 'app-product-list',
@@ -58,6 +61,7 @@ import { PermissionDirective } from '../../../../shared/directives/permission.di
     ProductForm,
     DebounceClickDirective,
     PermissionDirective,
+    PredicateFilter
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss'
@@ -72,6 +76,7 @@ export class ProductList implements OnInit, CanComponentDeactivate {
   private readonly exportService = inject(ExportService);
   private readonly pdfExportService = inject(PdfExportService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly predicateFilterService = inject(PredicateFilterService);
   private readonly pendingDeletes = new Map<
     number,
     {
@@ -115,6 +120,9 @@ export class ProductList implements OnInit, CanComponentDeactivate {
   columns: GridColumn[] = [];
 
   readonly search$ = toObservable(this.search);
+  readonly filter = signal<FilterGroup | null>(null);
+
+  filterFields: FilterField[] = [];
 
   ngOnInit(): void {
 
@@ -164,6 +172,48 @@ export class ProductList implements OnInit, CanComponentDeactivate {
         pipe: 'timeAgo'
       },
 
+    ];
+
+    this.filterFields = [
+      {
+        field: 'name',
+        label: 'Product',
+        type: 'text'
+      },
+      {
+        field: 'categoryId',
+        label: 'Category',
+        type: 'select',
+        options: this.categories().map(category => ({
+          label: category.name,
+          value: category.id
+        }))
+      },
+      {
+        field: 'price',
+        label: 'Price',
+        type: 'number'
+      },
+      {
+        field: 'stock',
+        label: 'Stock',
+        type: 'number'
+      },
+      {
+        field: 'status',
+        label: 'Status',
+        type: 'select',
+        options: [
+          {
+            label: 'Active',
+            value: 'Active'
+          },
+          {
+            label: 'Inactive',
+            value: 'Inactive'
+          }
+        ]
+      }
     ];
 
     this.route.queryParams
@@ -262,6 +312,14 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
     this.page = page;
 
+    if (this.filter()) {
+
+      this.applyPredicateFilter();
+
+      return;
+
+    }
+
     this.updateQueryParams();
 
   }
@@ -271,6 +329,14 @@ export class ProductList implements OnInit, CanComponentDeactivate {
     this.pageSize = pageSize;
 
     this.page = 1;
+
+    if (this.filter()) {
+
+      this.applyPredicateFilter();
+
+      return;
+
+    }
 
     this.updateQueryParams();
 
@@ -283,6 +349,14 @@ export class ProductList implements OnInit, CanComponentDeactivate {
     this.sortDirection = sort.direction;
 
     this.page = 1;
+
+    if (this.filter()) {
+
+      this.applyPredicateFilter();
+
+      return;
+
+    }
 
     this.updateQueryParams();
 
@@ -622,6 +696,260 @@ export class ProductList implements OnInit, CanComponentDeactivate {
     }
 
     return this.productForm?.canDeactivate() ?? true;
+
+  }
+
+  onFilterApply(filter: FilterGroup): void {
+
+    this.filter.set(filter);
+
+    this.page = 1;
+
+    this.applyPredicateFilter();
+
+  }
+
+  onFilterClear(): void {
+
+    this.filter.set(null);
+
+    this.page = 1;
+
+    this.loadProducts();
+
+  }
+
+  private applyPredicateFilter(): void {
+
+    const activeFilter = this.filter();
+
+    if (!activeFilter) {
+      this.loadProducts();
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.productService.getAll()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+
+        next: allProducts => {
+
+          let result = [...allProducts];
+
+          // Apply normal search first
+          const searchValue =
+            this.search()
+              .trim()
+              .toLowerCase();
+
+          if (searchValue) {
+
+            result = result.filter(product =>
+              product.name
+                .toLowerCase()
+                .includes(searchValue)
+            );
+
+          }
+
+          // Apply predicate filter
+          result = result.filter(product =>
+            this.evaluateFilterGroup(
+              product,
+              activeFilter
+            )
+          );
+
+          // Sorting
+          result.sort((a: any, b: any) => {
+
+            const valueA = a[this.sortField];
+            const valueB = b[this.sortField];
+
+            if (valueA == null) {
+              return 1;
+            }
+
+            if (valueB == null) {
+              return -1;
+            }
+
+            let comparison = 0;
+
+            if (valueA > valueB) {
+              comparison = 1;
+            }
+
+            if (valueA < valueB) {
+              comparison = -1;
+            }
+
+            return this.sortDirection === 'asc'
+              ? comparison
+              : -comparison;
+
+          });
+
+          // Total after filtering
+          this.totalRecords.set(
+            result.length
+          );
+
+          // Pagination
+          const start =
+            (this.page - 1) * this.pageSize;
+
+          const end =
+            start + this.pageSize;
+
+          this.products.set(
+            result.slice(start, end)
+          );
+
+        },
+
+        error: () => {
+
+          this.products.set([]);
+
+          this.totalRecords.set(0);
+
+          this.toastService.error(
+            'Failed to apply filters.'
+          );
+
+        }
+
+      });
+
+  }
+
+  private evaluateFilterGroup(
+    product: Product,
+    group: FilterGroup
+  ): boolean {
+
+    const conditionResults =
+      group.conditions.map(condition =>
+        this.evaluateCondition(
+          product,
+          condition
+        )
+      );
+
+    const groupResults =
+      group.groups.map(childGroup =>
+        this.evaluateFilterGroup(
+          product,
+          childGroup
+        )
+      );
+
+    const results = [
+      ...conditionResults,
+      ...groupResults
+    ];
+
+    // Empty group = don't filter anything
+    if (results.length === 0) {
+      return true;
+    }
+
+    if (group.logic === 'AND') {
+      return results.every(Boolean);
+    }
+
+    return results.some(Boolean);
+
+  }
+
+  private evaluateCondition(
+    product: Product,
+    condition: FilterCondition
+  ): boolean {
+
+    const actualValue =
+      (product as any)[condition.field];
+
+    const expectedValue =
+      condition.value;
+
+    if (
+      actualValue === null ||
+      actualValue === undefined
+    ) {
+      return false;
+    }
+
+    const actual =
+      String(actualValue).toLowerCase();
+
+    const expected =
+      String(expectedValue ?? '').toLowerCase();
+
+    switch (condition.operator) {
+
+      case 'equals':
+
+        return actual === expected;
+
+
+      case 'notEquals':
+
+        return actual !== expected;
+
+
+      case 'contains':
+
+        return actual.includes(expected);
+
+
+      case 'startsWith':
+
+        return actual.startsWith(expected);
+
+
+      case 'endsWith':
+
+        return actual.endsWith(expected);
+
+
+      case 'greaterThan':
+
+        return Number(actualValue) >
+          Number(expectedValue);
+
+
+      case 'greaterThanOrEqual':
+
+        return Number(actualValue) >=
+          Number(expectedValue);
+
+
+      case 'lessThan':
+
+        return Number(actualValue) <
+          Number(expectedValue);
+
+
+      case 'lessThanOrEqual':
+
+        return Number(actualValue) <=
+          Number(expectedValue);
+
+
+      default:
+
+        return false;
+
+    }
 
   }
 
