@@ -39,6 +39,7 @@ import { DataGrid } from '../../../../shared/components/data-grid/data-grid';
 import { ProductForm } from '../product-form/product-form';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ExportService } from '../../../../shared/services/export.service';
+import { PdfExportService } from '../../../../shared/services/pdf-export.service';
 
 @Component({
   selector: 'app-product-list',
@@ -60,6 +61,7 @@ export class ProductList implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly toastService = inject(ToastService);
   private readonly exportService = inject(ExportService);
+  private readonly pdfExportService = inject(PdfExportService);
 
   readonly products = signal<Product[]>([]);
   readonly loading = signal(false);
@@ -470,6 +472,40 @@ export class ProductList implements OnInit {
     this.exportService.exportToCsv(
 
       'products',
+
+      data
+
+    );
+
+  }
+
+  exportProductsPdf(): void {
+
+    const data = this.products().map(product => ({
+
+      ID: product.id,
+
+      Name: product.name,
+
+      Category: this.categories()
+        .find(category => category.id === product.categoryId)
+        ?.name ?? '',
+
+      Price: product.price,
+
+      Stock: product.stock,
+
+      Status: product.status,
+
+      CreatedAt: product.createdAt
+
+    }));
+
+    this.pdfExportService.exportToPdf(
+
+      'products',
+
+      'Products Report',
 
       data
 
