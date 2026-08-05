@@ -77,9 +77,8 @@
     </ng-template>
 
     <app-data-grid [rows]="products()" [columns]="columns" [loading]="loading()" [page]="page" [pageSize]="pageSize"
-        [totalRecords]="totalRecords()" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
-        (sortChange)="onSortChange($event)">
-
+        [totalRecords]="totalRecords()" [searchTerm]="search()" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (sortChange)="onSortChange($event)">
     </app-data-grid>
 
     @if (showModal()) {

@@ -1,3 +1,37 @@
+@if (showDraftPrompt()) {
+
+<div class="draft-prompt">
+
+    <div>
+        <strong>
+            Saved Draft Found
+        </strong>
+
+        <small>
+            A previous unfinished product was saved.
+            Would you like to restore it?
+        </small>
+    </div>
+
+    <div class="draft-actions">
+
+        <button type="button" class="btn btn-outline-secondary" (click)="discardDraft()">
+
+            Discard
+
+        </button>
+
+        <button type="button" class="btn btn-primary" (click)="restoreDraft()">
+
+            Restore
+
+        </button>
+
+    </div>
+
+</div>
+
+}
 <form [formGroup]="form" (ngSubmit)="submit()">
 
     <div class="mb-3">

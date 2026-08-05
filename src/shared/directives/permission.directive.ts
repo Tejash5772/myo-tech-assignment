@@ -2,43 +2,48 @@ import {
     Directive,
     ElementRef,
     Input,
-    OnInit
+    Renderer2,
+    inject
 } from '@angular/core';
+
+import { PermissionService } from '../../core/services/permission.service';
 
 @Directive({
     selector: '[appPermission]',
     standalone: true
 })
-export class PermissionDirective implements OnInit {
+export class PermissionDirective {
+
+    private readonly element = inject(ElementRef);
+    private readonly renderer = inject(Renderer2);
+    private readonly permissionService = inject(PermissionService);
 
     @Input()
-    appPermission = '';
+    set appPermission(permission: string) {
 
-    constructor(
-        private element: ElementRef<HTMLElement>
-    ) { }
+        this.updateVisibility(permission);
 
-    ngOnInit(): void {
+    }
 
-        // Example only.
-        // Replace with your authentication/roles service later.
-        const permissions = [
+    private updateVisibility(permission: string): void {
 
-            'CREATE',
+        const hasPermission =
+            this.permissionService.hasPermission(permission);
 
-            'EDIT',
+        if (hasPermission) {
 
-            'DELETE'
+            this.renderer.removeStyle(
+                this.element.nativeElement,
+                'display'
+            );
 
-        ];
+        } else {
 
-        if (
-
-            !permissions.includes(this.appPermission)
-
-        ) {
-
-            this.element.nativeElement.remove();
+            this.renderer.setStyle(
+                this.element.nativeElement,
+                'display',
+                'none'
+            );
 
         }
 

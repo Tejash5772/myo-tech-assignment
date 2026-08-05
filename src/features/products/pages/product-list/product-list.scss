@@ -13,17 +13,100 @@ input {
 .modal-backdrop-custom {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, .45);
+    z-index: 1050;
+
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1050;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.65);
 }
 
 .modal-content-custom {
-    background: #fff;
-    border-radius: 12px;
-    width: 600px;
-    max-width: 90vw;
-    padding: 24px;
+    width: 100%;
+    max-width: 750px;
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    padding: 28px;
+
+    background: var(--app-surface);
+    color: var(--app-text);
+
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Modal title */
+.modal-content-custom h4 {
+    color: var(--app-text);
+}
+
+/* Modal form labels */
+.modal-content-custom label {
+    color: var(--app-text);
+}
+
+/* Inputs */
+.modal-content-custom .form-control,
+.modal-content-custom .form-select,
+.modal-content-custom textarea {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-border);
+}
+
+/* Placeholder */
+.modal-content-custom .form-control::placeholder,
+.modal-content-custom textarea::placeholder {
+    color: var(--app-muted);
+}
+
+/* Focus */
+.modal-content-custom .form-control:focus,
+.modal-content-custom .form-select:focus,
+.modal-content-custom textarea:focus {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: #0d6efd;
+    box-shadow: none;
+}
+
+/* Select options */
+.modal-content-custom option {
+    background: var(--app-surface);
+    color: var(--app-text);
+}
+
+/* Validation */
+.modal-content-custom .text-danger {
+    color: #dc3545 !important;
+}
+
+/* Close button */
+.modal-content-custom .btn-close {
+    filter: none;
+}
+
+[data-theme='dark'] .modal-content-custom .btn-close {
+    filter: invert(1);
+}
+
+@media (max-width: 768px) {
+
+    .modal-backdrop-custom {
+        padding: 10px;
+        align-items: flex-start;
+    }
+
+    .modal-content-custom {
+        max-height: 95vh;
+        padding: 20px;
+    }
+
 }

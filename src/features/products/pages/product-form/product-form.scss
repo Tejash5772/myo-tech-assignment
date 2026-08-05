@@ -1,7 +1,90 @@
 :host {
     display: block;
+    color: var(--app-text);
 }
 
 form {
-    max-width: 500px;
+    color: var(--app-text);
+}
+
+.form-label {
+    color: var(--app-text);
+    font-weight: 500;
+}
+
+.form-control,
+.form-select,
+textarea {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-border);
+}
+
+.form-control::placeholder {
+    color: var(--app-muted);
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: #0d6efd;
+    box-shadow: none;
+}
+
+option {
+    background: var(--app-surface);
+    color: var(--app-text);
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.draft-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 14px 16px;
+
+    margin-bottom: 20px;
+
+    background: var(--app-surface-2);
+    color: var(--app-text);
+
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+}
+
+.draft-prompt strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.draft-prompt small {
+    display: block;
+    color: var(--app-muted);
+}
+
+.draft-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+
+    .draft-prompt {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .draft-actions {
+        justify-content: flex-end;
+    }
+
 }

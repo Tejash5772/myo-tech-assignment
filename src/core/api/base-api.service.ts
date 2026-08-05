@@ -1,6 +1,8 @@
 import { inject } from '@angular/core';
+
 import {
   HttpClient,
+  HttpContext,
   HttpParams
 } from '@angular/common/http';
 
@@ -22,14 +24,14 @@ export abstract class BaseApiService<T> {
 
   }
 
-  protected buildParams(params?: Record<string, any>): HttpParams {
+  protected buildParams(
+    params?: Record<string, any>
+  ): HttpParams {
 
     let httpParams = new HttpParams();
 
     if (!params) {
-
       return httpParams;
-
     }
 
     Object.entries(params).forEach(([key, value]) => {
@@ -40,7 +42,10 @@ export abstract class BaseApiService<T> {
         value !== ''
       ) {
 
-        httpParams = httpParams.set(key, value);
+        httpParams = httpParams.set(
+          key,
+          value
+        );
 
       }
 
@@ -50,37 +55,65 @@ export abstract class BaseApiService<T> {
 
   }
 
-  getAll(params?: Record<string, any>): Observable<T[]> {
+  getAll(
+    params?: Record<string, any>,
+    context?: HttpContext
+  ): Observable<T[]> {
 
-    return this.http.get<T[]>(this.url, {
-
-      params: this.buildParams(params)
-
-    });
-
-  }
-
-  getById(id: number): Observable<T> {
-
-    return this.http.get<T>(`${this.url}/${id}`);
-
-  }
-
-  create(payload: Partial<T>): Observable<T> {
-
-    return this.http.post<T>(this.url, payload);
+    return this.http.get<T[]>(
+      this.url,
+      {
+        params: this.buildParams(params),
+        context
+      }
+    );
 
   }
 
-  update(id: number, payload: Partial<T>): Observable<T> {
+  getById(
+    id: number,
+    context?: HttpContext
+  ): Observable<T> {
 
-    return this.http.put<T>(`${this.url}/${id}`, payload);
+    return this.http.get<T>(
+      `${this.url}/${id}`,
+      {
+        context
+      }
+    );
 
   }
 
-  delete(id: number): Observable<void> {
+  create(
+    payload: Partial<T>
+  ): Observable<T> {
 
-    return this.http.delete<void>(`${this.url}/${id}`);
+    return this.http.post<T>(
+      this.url,
+      payload
+    );
+
+  }
+
+  update(
+    id: number,
+    payload: Partial<T>
+  ): Observable<T> {
+
+    return this.http.put<T>(
+      `${this.url}/${id}`,
+      payload
+    );
+
+  }
+
+  delete(
+    id: number
+  ): Observable<void> {
+
+    return this.http.delete<void>(
+      `${this.url}/${id}`
+    );
 
   }
 

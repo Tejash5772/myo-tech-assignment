@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import {
+  HttpContext,
   HttpResponse
 } from '@angular/common/http';
 
@@ -27,29 +28,42 @@ export class ProductService extends BaseApiService<Product> {
 
   protected override endpoint = 'products';
 
-  search(params?: Record<string, any>): Observable<ProductSearchResult> {
+  search(
+    params?: Record<string, any>,
+    context?: HttpContext
+  ): Observable<ProductSearchResult> {
 
-    return this.http.get<Product[]>(this.url, {
+    return this.http.get<Product[]>(
+      this.url,
+      {
 
-      params: this.buildParams(params),
+        params: this.buildParams(params),
 
-      observe: 'response'
+        context,
 
-    }).pipe(
+        observe: 'response'
 
-      map((response: HttpResponse<Product[]>) => ({
+      }
+    ).pipe(
 
-        items: response.body ?? [],
+      map(
+        (
+          response: HttpResponse<Product[]>
+        ) => ({
 
-        total: Number(
-          response.headers.get('X-Total-Count') ?? response.body?.length ?? 0
-        )
+          items: response.body ?? [],
 
-      }))
+          total: Number(
+            response.headers.get('X-Total-Count')
+            ?? response.body?.length
+            ?? 0
+          )
+
+        })
+      )
 
     );
 
   }
-  
 
 }

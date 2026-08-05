@@ -62,6 +62,8 @@ import {
 import { PredicateFilterService } from '../../../../core/services/predicate-filter.service';
 
 import { FilterGroup } from '../../../../core/models/predicate-filter';
+import { CANCEL_SEARCH } from '../../../../core/interceptors/search-cancel.interceptor';
+import { HttpContext } from '@angular/common/http';
 
 @Component({
   selector: 'app-product-list',
@@ -434,7 +436,7 @@ export class ProductList
     this.search$
       .pipe(
 
-        debounceTime(400),
+        debounceTime(500),
 
         distinctUntilChanged(),
 
@@ -484,19 +486,22 @@ export class ProductList
 
     this.loading.set(true);
 
-    return this.productService.search({
+    return this.productService.search(
 
-      _page: this.page,
+      {
+        _page: this.page,
+        _limit: this.pageSize,
+        _sort: this.sortField,
+        _order: this.sortDirection,
+        q: this.search()
+      },
 
-      _limit: this.pageSize,
+      new HttpContext().set(
+        CANCEL_SEARCH,
+        true
+      )
 
-      _sort: this.sortField,
-
-      _order: this.sortDirection,
-
-      q: this.search()
-
-    }).pipe(
+    ).pipe(
 
       tap(result => {
 
@@ -700,11 +705,9 @@ export class ProductList
 
   async closeModal(): Promise<void> {
 
-    /*
-     * Add mode.
-     */
-
     if (!this.selectedProduct()) {
+
+      localStorage.removeItem('product-form-draft');
 
       this.showModal.set(false);
 
@@ -712,21 +715,14 @@ export class ProductList
 
     }
 
-    /*
-     * Edit mode.
-     */
-
     const canClose =
-      await (
-        this.productForm
-          ?.canDeactivate() ?? true
-      );
+      await (this.productForm?.canDeactivate() ?? true);
 
     if (!canClose) {
-
       return;
-
     }
+
+    localStorage.removeItem('product-form-draft');
 
     this.selectedProduct.set(null);
 
