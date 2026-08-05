@@ -1,46 +1,51 @@
-<div class="upload-box" [class.dragging]="dragging()" (dragover)="dragOver($event)" (dragleave)="dragLeave($event)"
-    (drop)="drop($event)">
+<div class="file-upload" [class.dragging]="dragging()" [class.disabled]="disabled" (dragover)="dragOver($event)"
+    (dragleave)="dragLeave($event)" (drop)="drop($event)">
+    @if (!preview()) {
 
-    @if (preview()) {
+    <div class="upload-content">
 
-    <img [src]="preview()!" class="preview">
+        <div class="upload-text">
+            Drag & Drop Image Here
+        </div>
+
+        <button type="button" class="btn btn-primary" [disabled]="disabled" (click)="fileInput.click()">
+            Browse
+        </button>
+
+        <input #fileInput type="file" accept="image/*" hidden (change)="browse($event)" />
+
+    </div>
 
     } @else {
 
-    <p>Drag & Drop Image Here</p>
+    <div class="preview-container">
+
+        <img [src]="preview()" alt="Product preview" class="image-preview" />
+
+        <button type="button" class="btn btn-danger" [disabled]="disabled" (click)="removeFile()">
+            Remove Image
+        </button>
+
+    </div>
 
     }
 
-    <input #file hidden type="file" accept="image/*" (change)="browse($event)">
-
-    <button type="button" class="btn btn-primary" (click)="file.click()">
-
-        Browse
-
-    </button>
-
 </div>
+
+@if (validationErrors?.['invalidType']) {
+<div class="text-danger mt-2">
+    Please select a valid image file.
+</div>
+}
 
 @if (validationErrors?.['maxFileSize']) {
-
 <div class="text-danger mt-2">
-    Maximum file size is 2 MB.
+    Image size must be less than 2 MB.
 </div>
-
 }
 
 @if (validationErrors?.['invalidDimensions']) {
-
 <div class="text-danger mt-2">
-    Image must be at least 300 × 300 pixels.
+    Image dimensions must be at least 300 × 300 pixels.
 </div>
-
-}
-
-@if (validationErrors?.['invalidType']) {
-
-<div class="text-danger mt-2">
-    Only image files are allowed.
-</div>
-
 }

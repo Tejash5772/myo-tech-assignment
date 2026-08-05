@@ -1,23 +1,74 @@
 <section class="container py-4">
+
   <div class="mb-4">
     <h2>Dynamic Form Engine</h2>
+
     <p class="text-muted mb-0">
-      Schema loaded from <code>/api/dynamic-schema</code>. Category drives Sub Category options and conditional validation.
+      Schema loaded from
+      <code>/api/dynamic-schema</code>.
+      Category drives Sub Category options and conditional validation.
     </p>
   </div>
 
+
   @if (loading()) {
-    <div class="alert alert-info">Loading dynamic schema...</div>
+
+  <div class="alert alert-info">
+    Loading dynamic schema...
+  </div>
+
   } @else if (fields().length) {
-    <app-dynamic-form [fields]="fields()" (submitForm)="onSubmit($event)"></app-dynamic-form>
+
+  <app-dynamic-form [fields]="fields()" (submitForm)="onSubmit($event)">
+  </app-dynamic-form>
+
   } @else {
-    <div class="alert alert-warning">Unable to load the dynamic schema. Start json-server and refresh.</div>
+
+  <div class="alert alert-warning">
+    Unable to load the dynamic schema.
+    Start json-server and refresh.
+  </div>
+
   }
 
-  @if (submitted(); as value) {
-    <div class="mt-4">
-      <h5>Submitted value</h5>
-      <pre class="bg-light p-3 rounded">{{ value | json }}</pre>
-    </div>
+
+  @if (saving()) {
+
+  <div class="alert alert-info mt-4">
+    Saving product...
+  </div>
+
   }
+
+
+  @if (successMessage()) {
+
+  <div class="alert alert-success mt-4">
+    {{ successMessage() }}
+  </div>
+
+  }
+
+
+  @if (errorMessage()) {
+
+  <div class="alert alert-danger mt-4">
+    {{ errorMessage() }}
+  </div>
+
+  }
+
+
+  @if (submitted(); as value) {
+
+  <div class="mt-4">
+
+    <h5>Submitted value</h5>
+
+    <pre class="bg-light p-3 rounded">{{ value | json }}</pre>
+
+  </div>
+
+  }
+
 </section>

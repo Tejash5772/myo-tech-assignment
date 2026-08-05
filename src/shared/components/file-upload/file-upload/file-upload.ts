@@ -242,4 +242,16 @@ export class FileUpload implements ControlValueAccessor, Validator {
 
   }
 
+  removeFile(): void {
+    this.validationErrors = null;
+
+    this.ngZone.run(() => {
+      this.value = null;
+      this.preview.set(null);
+
+      this.onChange(null);
+      this.onTouched();
+    });
+  }
+
 }

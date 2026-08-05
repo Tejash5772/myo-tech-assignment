@@ -6,6 +6,21 @@
 
     <div class="mb-3">
 
+        @if (field.type === 'file') {
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                {{ field.label }}
+            </label>
+
+            <app-file-upload [formControlName]="field.name">
+            </app-file-upload>
+
+        </div>
+
+        }
+
         @if (field.type !== 'checkbox') {
 
         <label class="form-label">
