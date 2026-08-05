@@ -1,47 +1,49 @@
-@if (dialog.isOpen()) {
+<div class="modal fade show d-block" tabindex="-1" *ngIf="dialog.isOpen()">
 
-<div class="modal-backdrop-custom">
+    <div class="modal-dialog modal-dialog-centered">
 
-    <div class="confirm-dialog">
+        <div class="modal-content">
 
-        <div class="confirm-header">
+            <div class="modal-header">
 
-            <h5 class="mb-0">
+                <h5 class="modal-title">
 
-                {{ dialog.options()?.title }}
+                    {{ dialog.options()?.title }}
 
-            </h5>
+                </h5>
 
-        </div>
+            </div>
 
-        <div class="confirm-body">
-
-            <p class="mb-0">
+            <div class="modal-body">
 
                 {{ dialog.options()?.message }}
 
-            </p>
+            </div>
 
-        </div>
+            <div class="modal-footer">
 
-        <div class="confirm-footer">
+                <button class="btn btn-secondary" (click)="dialog.cancelAction()">
 
-            <button class="btn btn-secondary" (click)="dialog.cancelAction()">
+                    {{ dialog.options()?.cancelText }}
 
-                {{ dialog.options()?.cancelText }}
+                </button>
 
-            </button>
+                <button class="btn btn-danger" (click)="dialog.confirmAction()">
 
-            <button class="btn btn-danger" (click)="dialog.confirmAction()">
+                    {{ dialog.options()?.confirmText }}
 
-                {{ dialog.options()?.confirmText }}
+                </button>
 
-            </button>
+            </div>
 
         </div>
 
     </div>
 
 </div>
+
+@if (dialog.isOpen()) {
+
+<div class="modal-backdrop fade show"></div>
 
 }
