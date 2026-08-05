@@ -24,10 +24,11 @@ import {
   tap,
   finalize,
   Subscription,
-  timer
+  timer,
+  map
 } from 'rxjs';
 
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 import { ProductService } from '../../services/product.service';
 
@@ -87,13 +88,23 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
   readonly showModal = signal(false);
   readonly selectedProduct = signal<Product | null>(null);
-  readonly categories = signal<Category[]>([]);
+  readonly categories = toSignal(
+    this.route.data.pipe(
+      map(data => data['categories'] as Category[] ?? [])
+    ),
+    {
+      initialValue: [] as Category[]
+    }
+  );
 
   @ViewChild('actionTemplate', { static: true })
   actionTemplate!: TemplateRef<Product>;
 
   @ViewChild(ProductForm)
   productForm?: ProductForm;
+
+  @ViewChild('imageTemplate', { static: true })
+  imageTemplate!: TemplateRef<Product>;
 
   page = 1;
   pageSize = 10;
@@ -103,7 +114,7 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
   columns: GridColumn[] = [];
 
-  private readonly searchSubject = new Subject<string>();
+  readonly search$ = toObservable(this.search);
 
   ngOnInit(): void {
 
@@ -118,6 +129,11 @@ export class ProductList implements OnInit, CanComponentDeactivate {
         field: 'name',
         header: 'Product',
         sortable: true
+      },
+      {
+        field: 'image',
+        header: 'Image',
+        template: this.imageTemplate
       },
       {
         field: 'price',
@@ -150,10 +166,6 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
     ];
 
-    this.categories.set(
-      this.route.snapshot.data['categories'] ?? []
-    );
-
     this.route.queryParams
       .pipe(
 
@@ -180,17 +192,19 @@ export class ProductList implements OnInit, CanComponentDeactivate {
 
       });
 
-    this.searchSubject
+    this.search$
       .pipe(
-
         debounceTime(400),
-
         distinctUntilChanged(),
+        tap(() => {
 
+          this.page = 1;
+
+          this.updateQueryParams();
+
+        }),
         switchMap(() => this.fetchProducts()),
-
         takeUntilDestroyed(this.destroyRef)
-
       )
       .subscribe();
 
@@ -241,12 +255,6 @@ export class ProductList implements OnInit, CanComponentDeactivate {
   onSearch(value: string): void {
 
     this.search.set(value);
-
-    this.page = 1;
-
-    this.updateQueryParams();
-
-    this.searchSubject.next(value);
 
   }
 
@@ -377,20 +385,41 @@ export class ProductList implements OnInit, CanComponentDeactivate {
       )
       .subscribe({
 
-        next: () => {
+        next: (savedProduct: Product) => {
 
-          this.closeModal();
+          if (this.selectedProduct()) {
 
-          this.loadProducts();
+            // Update existing product
+            this.products.update(products =>
+              products.map(product =>
+                product.id === savedProduct.id
+                  ? savedProduct
+                  : product
+              )
+            );
+
+          } else {
+
+            // Add new product
+            this.products.update(products => [
+              savedProduct,
+              ...products
+            ]);
+
+            this.totalRecords.update(total => total + 1);
+
+          }
+
+          const isEdit = !!this.selectedProduct();
+
+          this.selectedProduct.set(null);
+
+          this.showModal.set(false);
 
           this.toastService.success(
-
-            this.selectedProduct()
-
+            isEdit
               ? 'Product updated successfully.'
-
               : 'Product created successfully.'
-
           );
 
         },

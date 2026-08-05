@@ -3,23 +3,17 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <h2 class="mb-0">
-
             Products
-
         </h2>
 
         <div class="d-flex gap-2">
 
             <button class="btn btn-outline-success" (click)="exportProducts()">
-
                 Export CSV
-
             </button>
 
             <button class="btn btn-outline-danger" (click)="exportProductsPdf()">
-
                 Export PDF
-
             </button>
 
             <button class="btn btn-primary" appDebounceClick appPermission="CREATE" (debounceClick)="openAddProduct()">
@@ -43,23 +37,39 @@
 
     </div>
 
-    <ng-template #actionTemplate let-product>
+    <!-- Image Template -->
+    <ng-template #imageTemplate let-row>
 
-        <div class="d-flex gap-2">
+        @if (row.image) {
 
-            <button class="btn btn-sm btn-outline-primary" appPermission="EDIT" (click)="openEditProduct(product); $event.stopPropagation()">
+        <img [src]="row.image" alt="Product" width="60" height="60" class="rounded border" style="object-fit: cover;">
 
-                Edit
+        } @else {
 
-            </button>
+        <span class="text-muted">
+            No Image
+        </span>
 
-            <button class="btn btn-sm btn-outline-danger" appPermission="DELETE" (click)="deleteProduct(product); $event.stopPropagation()">
+        }
 
-                Delete
+    </ng-template>
 
-            </button>
+    <!-- Existing Action Template -->
+    <ng-template #actionTemplate let-row>
 
-        </div>
+        <!-- Keep your existing Edit/Delete buttons here -->
+
+        <button class="btn btn-sm btn-primary me-2" (click)="openEditProduct(row); $event.stopPropagation()">
+
+            Edit
+
+        </button>
+
+        <button class="btn btn-sm btn-danger" (click)="deleteProduct(row); $event.stopPropagation()">
+
+            Delete
+
+        </button>
 
     </ng-template>
 
@@ -68,6 +78,7 @@
         (sortChange)="onSortChange($event)">
 
     </app-data-grid>
+
     @if (showModal()) {
 
     <div class="modal-backdrop-custom">
@@ -89,6 +100,7 @@
 
             <app-product-form [product]="selectedProduct()" [categories]="categories()" (save)="saveProduct($event)"
                 (cancel)="closeModal()">
+
             </app-product-form>
 
         </div>

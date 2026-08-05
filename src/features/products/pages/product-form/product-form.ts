@@ -22,13 +22,15 @@ import { Category } from '../../../../core/models/category';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { CanComponentDeactivate } from '../../../../core/models/can-component-deactivate';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
+import { FileUpload } from '../../../../shared/components/file-upload/file-upload/file-upload';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FileUpload
   ],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss'
@@ -63,7 +65,9 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
 
     stock: [0, [Validators.required, Validators.min(0)]],
 
-    status: ['Active', Validators.required]
+    status: ['Active', Validators.required],
+
+    image: [null as string | null]
 
   });
 
@@ -79,7 +83,9 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
           categoryId: this.product.categoryId,
           price: this.product.price,
           stock: this.product.stock,
-          status: this.product.status
+          status: this.product.status,
+          image: this.product.image ?? null
+
 
         });
 

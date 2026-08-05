@@ -115,6 +115,19 @@
 
     </div>
 
+    <div class="mb-3">
+
+        <label class="form-label">
+
+            Product Image
+
+        </label>
+
+        <app-file-upload formControlName="image">
+        </app-file-upload>
+
+    </div>
+
     <div class="d-flex gap-2 justify-content-end">
 
         <button type="button" class="btn btn-secondary" (click)="cancelForm()">
@@ -123,7 +136,7 @@
 
         </button>
 
-        <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
 
             Save
 

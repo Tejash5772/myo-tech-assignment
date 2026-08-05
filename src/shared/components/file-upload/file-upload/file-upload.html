@@ -1,0 +1,46 @@
+<div class="upload-box" [class.dragging]="dragging()" (dragover)="dragOver($event)" (dragleave)="dragLeave($event)"
+    (drop)="drop($event)">
+
+    @if (preview()) {
+
+    <img [src]="preview()!" class="preview">
+
+    } @else {
+
+    <p>Drag & Drop Image Here</p>
+
+    }
+
+    <input #file hidden type="file" accept="image/*" (change)="browse($event)">
+
+    <button type="button" class="btn btn-primary" (click)="file.click()">
+
+        Browse
+
+    </button>
+
+</div>
+
+@if (validationErrors?.['maxFileSize']) {
+
+<div class="text-danger mt-2">
+    Maximum file size is 2 MB.
+</div>
+
+}
+
+@if (validationErrors?.['invalidDimensions']) {
+
+<div class="text-danger mt-2">
+    Image must be at least 300 × 300 pixels.
+</div>
+
+}
+
+@if (validationErrors?.['invalidType']) {
+
+<div class="text-danger mt-2">
+    Only image files are allowed.
+</div>
+
+}
