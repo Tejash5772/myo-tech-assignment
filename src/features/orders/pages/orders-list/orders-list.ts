@@ -262,6 +262,10 @@ export class OrdersList implements OnInit, OnDestroy {
     ]);
   }
 
+  goToProducts(): void {
+    this.router.navigate(['/products']);
+  }
+
   ngOnDestroy(): void {
 
     this.destroy$.next();

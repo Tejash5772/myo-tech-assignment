@@ -26,13 +26,17 @@ export class HighlightMatchDirective implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
 
-        const text = this.appHighlightMatch;
+        const text = this.appHighlightMatch ?? '';
+        const search = this.searchTerm?.trim() ?? '';
 
-        if (!this.searchTerm.trim()) {
+        const element =
+            this.element.nativeElement as HTMLElement;
+
+        if (!search) {
 
             this.renderer.setProperty(
-                this.element.nativeElement,
-                'innerHTML',
+                element,
+                'textContent',
                 text
             );
 
@@ -40,31 +44,59 @@ export class HighlightMatchDirective implements OnChanges {
 
         }
 
-        const regex = new RegExp(
+        // Escape regex special characters
+        const escapedSearch =
+            search.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                '\\$&'
+            );
 
-            `(${this.searchTerm})`,
+        const regex =
+            new RegExp(
+                `(${escapedSearch})`,
+                'gi'
+            );
 
-            'gi'
+        const parts =
+            text.split(regex);
 
-        );
-
-        const highlighted = text.replace(
-
-            regex,
-
-            '<mark>$1</mark>'
-
-        );
-
+        // Clear existing content
         this.renderer.setProperty(
-
-            this.element.nativeElement,
-
-            'innerHTML',
-
-            highlighted
-
+            element,
+            'textContent',
+            ''
         );
+
+        for (const part of parts) {
+
+            if (
+                part.toLowerCase() ===
+                search.toLowerCase()
+            ) {
+
+                const mark =
+                    this.renderer.createElement('mark');
+
+                this.renderer.appendChild(
+                    mark,
+                    this.renderer.createText(part)
+                );
+
+                this.renderer.appendChild(
+                    element,
+                    mark
+                );
+
+            } else {
+
+                this.renderer.appendChild(
+                    element,
+                    this.renderer.createText(part)
+                );
+
+            }
+
+        }
 
     }
 

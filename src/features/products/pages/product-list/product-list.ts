@@ -1399,4 +1399,8 @@ export class ProductList
 
   }
 
+  goToOrders(): void {
+    this.router.navigate(['/orders']);
+  }
+
 }

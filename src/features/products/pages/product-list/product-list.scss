@@ -89,12 +89,39 @@ input {
 }
 
 /* Close button */
+/* Close button - light theme */
 .modal-content-custom .btn-close {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+
+    border-radius: 50%;
+    background-color: transparent;
+
+    opacity: 0.75;
     filter: none;
+
+    transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease;
 }
 
+/* Dark theme */
 [data-theme='dark'] .modal-content-custom .btn-close {
-    filter: invert(1);
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.85;
+}
+
+/* Hover */
+.modal-content-custom .btn-close:hover {
+    background-color: rgba(127, 127, 127, 0.15);
+    opacity: 1;
+}
+
+/* Focus */
+.modal-content-custom .btn-close:focus {
+    box-shadow: none;
+    outline: none;
 }
 
 @media (max-width: 768px) {

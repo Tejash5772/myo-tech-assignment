@@ -1,5 +1,17 @@
 <div class="orders-page">
 
+    <!-- Back to Products -->
+    <div class="mb-3">
+
+        <button type="button" class="btn btn-outline-primary" (click)="goToProducts()">
+
+            ← Back to Products
+
+        </button>
+
+    </div>
+
+
     <div class="page-header">
 
         <div>
@@ -8,7 +20,9 @@
         </div>
 
         <button type="button" class="btn btn-primary" (click)="goToCreateOrder()">
+
             + Create Order
+
         </button>
 
     </div>
@@ -17,11 +31,15 @@
     @if (errorMessage) {
 
     <div class="alert alert-danger">
+
         {{ errorMessage }}
 
         <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="loadOrders()">
+
             Retry
+
         </button>
+
     </div>
 
     }

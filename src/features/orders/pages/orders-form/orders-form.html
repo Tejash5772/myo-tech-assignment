@@ -1,6 +1,16 @@
 <div class="order-form-page">
 
-    <h2>Create Order</h2>
+    <div class="page-header">
+
+        <button type="button" class="back-button" (click)="goBackToOrders()">
+
+            ← Back to Orders
+
+        </button>
+
+        <h2>Create Order</h2>
+
+    </div>
 
     <form [formGroup]="orderForm" (ngSubmit)="save()">
 
@@ -242,56 +252,58 @@
         </section>
 
 
-        <!-- SUMMARY -->
-        <section class="order-summary">
+        <div class="order-sidebar">
 
-            <h3>Order Summary</h3>
+            <section class="order-summary">
 
-            <div>
-                <span>Subtotal</span>
-                <strong>
-                    {{ subtotal | number:'1.2-2' }}
-                </strong>
-            </div>
+                <h3>Order Summary</h3>
 
-            <div>
-                <span>Tax</span>
-                <strong>
-                    {{ taxTotal | number:'1.2-2' }}
-                </strong>
-            </div>
+                <div>
+                    <span>Subtotal</span>
+                    <strong>
+                        {{ subtotal | number:'1.2-2' }}
+                    </strong>
+                </div>
 
-            <div>
-                <span>Discount</span>
-                <strong>
-                    -{{ discountTotal | number:'1.2-2' }}
-                </strong>
-            </div>
+                <div>
+                    <span>Tax</span>
+                    <strong>
+                        {{ taxTotal | number:'1.2-2' }}
+                    </strong>
+                </div>
 
-            <div>
-                <span>Shipping</span>
-                <strong>
-                    {{ shipping | number:'1.2-2' }}
-                </strong>
-            </div>
+                <div>
+                    <span>Discount</span>
+                    <strong>
+                        -{{ discountTotal | number:'1.2-2' }}
+                    </strong>
+                </div>
 
-            <hr />
+                <div>
+                    <span>Shipping</span>
+                    <strong>
+                        {{ shipping | number:'1.2-2' }}
+                    </strong>
+                </div>
 
-            <div>
-                <strong>Total</strong>
+                <hr>
 
-                <strong>
-                    {{ grandTotal | number:'1.2-2' }}
-                </strong>
-            </div>
+                <div>
+                    <strong>Total</strong>
+                    <strong>
+                        {{ grandTotal | number:'1.2-2' }}
+                    </strong>
+                </div>
 
-        </section>
+            </section>
 
+            <button type="submit" [disabled]="saving">
 
-        <!-- SUBMIT -->
-        <button type="submit" [disabled]="saving">
-            {{ saving ? 'Saving...' : 'Create Order' }}
-        </button>
+                {{ saving ? 'Saving...' : 'Create Order' }}
+
+            </button>
+
+        </div>
 
     </form>
 

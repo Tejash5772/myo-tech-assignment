@@ -323,20 +323,47 @@ export class OrdersForm implements OnInit {
       price: number | null;
     }>;
 
+    const taxes = formValue.taxes as Array<{
+      name: string | null;
+      rate: number | null;
+    }>;
+
+    const discounts = formValue.discounts as Array<{
+      name: string | null;
+      amount: number | null;
+    }>;
+
     const payload = {
-      customerName: formValue.customer?.name ?? '',
 
-      orderDate: new Date().toISOString(),
-
-      status: 'Pending' as const,
-
-      totalAmount: this.grandTotal,
+      customer: {
+        name: formValue.customer?.name ?? '',
+        email: formValue.customer?.email ?? '',
+        phone: formValue.customer?.phone ?? ''
+      },
 
       items: items.map(item => ({
         productId: Number(item.productId),
         quantity: Number(item.quantity),
         price: Number(item.price)
-      }))
+      })),
+
+      taxes: taxes.map(tax => ({
+        name: tax.name ?? '',
+        rate: Number(tax.rate ?? 0)
+      })),
+
+      discounts: discounts.map(discount => ({
+        name: discount.name ?? '',
+        amount: Number(discount.amount ?? 0)
+      })),
+
+      shipping: Number(formValue.shipping ?? 0),
+
+      orderDate: new Date().toISOString(),
+
+      status: 'Pending' as const,
+
+      totalAmount: this.grandTotal
     };
 
     this.orderService.create(payload).subscribe({
@@ -355,4 +382,8 @@ export class OrdersForm implements OnInit {
       }
     });
   }
+
+  goBackToOrders(): void {
+    this.router.navigate(['/orders']);
+}
 }

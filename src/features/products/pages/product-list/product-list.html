@@ -8,12 +8,22 @@
 
         <div class="d-flex gap-2">
 
+            <button type="button" class="btn btn-outline-primary" (click)="goToOrders()">
+
+                Orders
+
+            </button>
+
             <button class="btn btn-outline-success" (click)="exportProducts()">
+
                 Export CSV
+
             </button>
 
             <button class="btn btn-outline-danger" (click)="exportProductsPdf()">
+
                 Export PDF
+
             </button>
 
             <button class="btn btn-primary" appDebounceClick appPermission="CREATE" (debounceClick)="openAddProduct()">
