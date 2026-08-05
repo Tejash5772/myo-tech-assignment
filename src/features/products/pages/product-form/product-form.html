@@ -115,6 +115,36 @@
 
     </div>
 
+    @if (showInactiveReason()) {
+
+    <div class="mb-3">
+
+        <label class="form-label">
+
+            Inactive Reason
+
+        </label>
+
+        <textarea rows="3" class="form-control" formControlName="inactiveReason">
+    </textarea>
+
+        @if (
+        form.controls.inactiveReason.invalid &&
+        form.controls.inactiveReason.touched
+        ) {
+
+        <div class="text-danger mt-1">
+
+            Reason is required and must contain at least 5 characters.
+
+        </div>
+
+        }
+
+    </div>
+
+    }
+
     <div class="mb-3">
 
         <label class="form-label">

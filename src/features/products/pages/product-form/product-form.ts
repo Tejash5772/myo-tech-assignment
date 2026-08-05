@@ -6,7 +6,8 @@ import {
   OnChanges,
   SimpleChanges,
   inject,
-  OnInit
+  OnInit,
+  signal
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -19,7 +20,7 @@ import {
 
 import { Product } from '../../../../core/models/product';
 import { Category } from '../../../../core/models/category';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 import { CanComponentDeactivate } from '../../../../core/models/can-component-deactivate';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { FileUpload } from '../../../../shared/components/file-upload/file-upload/file-upload';
@@ -42,6 +43,8 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
   private readonly confirmDialog = inject(
     ConfirmDialogService
   );
+
+  readonly showInactiveReason = signal(false);
 
   @Input()
   product: Product | null = null;
@@ -67,7 +70,9 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
 
     status: ['Active', Validators.required],
 
-    image: [null as string | null]
+    image: [null as string | null],
+
+    inactiveReason: ['']
 
   });
 
@@ -84,8 +89,8 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
           price: this.product.price,
           stock: this.product.stock,
           status: this.product.status,
-          image: this.product.image ?? null
-
+          image: this.product.image ?? null,
+          inactiveReason: (this.product as any).inactiveReason ?? ''
 
         });
 
@@ -137,6 +142,37 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
 
       });
 
+    this.form.controls.status.valueChanges
+      .pipe(
+        startWith(this.form.controls.status.value)
+      )
+      .subscribe(status => {
+
+        const reason = this.form.controls.inactiveReason;
+
+        if (status === 'Inactive') {
+
+          this.showInactiveReason.set(true);
+
+          reason.setValidators([
+            Validators.required,
+            Validators.minLength(5)
+          ]);
+
+        } else {
+
+          this.showInactiveReason.set(false);
+
+          reason.clearValidators();
+
+          reason.setValue('');
+
+        }
+
+        reason.updateValueAndValidity();
+
+      });
+
   }
 
   submit(): void {
@@ -155,9 +191,15 @@ export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
 
     );
 
-    this.save.emit(
-      this.form.getRawValue()
-    );
+    const product = this.form.getRawValue();
+
+    if (product.status !== 'Inactive') {
+
+      product.inactiveReason = '';
+
+    }
+
+    this.save.emit(product);
 
     this.form.markAsPristine();
 
