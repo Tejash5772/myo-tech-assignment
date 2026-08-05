@@ -1,9 +1,10 @@
 import { TemplateRef } from '@angular/core';
 
-export interface GridColumn<T = any> {
-  field: keyof T | string;
+export interface GridColumn {
+  field: string;
   header: string;
-  sortable?: boolean;
   width?: string;
+  sortable?: boolean;
   template?: TemplateRef<any>;
+  pipe?: 'currency' | 'status' | 'timeAgo';
 }

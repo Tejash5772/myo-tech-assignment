@@ -14,6 +14,12 @@ import {
 import { GridColumn } from '../../../core/models/grid-column';
 import { GridSort } from '../../../core/models/grid-sort';
 import { SkeletonLoader } from '../skeleton-loader/skeleton-loader';
+import { DebounceClickDirective } from '../../directives/debounce-click.directive';
+import { HighlightMatchDirective } from '../../directives/highlight-match.directive';
+import { PermissionDirective } from '../../directives/permission.directive';
+import { CustomCurrencyPipe } from '../../pipes/custom-currency.pipe';
+import { StatusBadgePipe } from '../../pipes/status-badge.pipe';
+import { TimeAgoPipe } from '../../pipes/time-ago.pipe';
 
 @Component({
   selector: 'app-data-grid',
@@ -21,6 +27,10 @@ import { SkeletonLoader } from '../skeleton-loader/skeleton-loader';
   imports: [
     CommonModule,
     SkeletonLoader,
+    CustomCurrencyPipe,
+    StatusBadgePipe,
+    TimeAgoPipe,
+    HighlightMatchDirective,
     NgTemplateOutlet
   ],
   templateUrl: './data-grid.html',

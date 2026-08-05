@@ -22,7 +22,7 @@
 
             </button>
 
-            <button class="btn btn-primary" (click)="openAddProduct()">
+            <button class="btn btn-primary" appDebounceClick appPermission="CREATE" (debounceClick)="openAddProduct()">
 
                 Add Product
 
@@ -47,13 +47,13 @@
 
         <div class="d-flex gap-2">
 
-            <button class="btn btn-sm btn-outline-primary" (click)="openEditProduct(product); $event.stopPropagation()">
+            <button class="btn btn-sm btn-outline-primary" appPermission="EDIT" (click)="openEditProduct(product); $event.stopPropagation()">
 
                 Edit
 
             </button>
 
-            <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product); $event.stopPropagation()">
+            <button class="btn btn-sm btn-outline-danger" appPermission="DELETE" (click)="deleteProduct(product); $event.stopPropagation()">
 
                 Delete
 

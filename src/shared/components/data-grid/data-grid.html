@@ -11,7 +11,7 @@
 
         <table class="table table-hover align-middle mb-0">
 
-            <thead class="table-secondary">
+            <thead>
 
                 <tr>
 
@@ -78,16 +78,41 @@
                         @if (column.template) {
 
                         <ng-container *ngTemplateOutlet="
-                        column.template;
-                        context: {
-                          $implicit: row
-                        }
-                      ">
+                                column.template;
+                                context: { $implicit: row }
+                            ">
                         </ng-container>
 
-                        } @else {
+                        }
 
-                        {{ $any(row)[column.field] }}
+                        @else if (column.pipe === 'currency') {
+
+                        {{ row[column.field] | customCurrency }}
+
+                        }
+
+                        @else if (column.pipe === 'status') {
+
+                        {{ row[column.field] | statusBadge }}
+
+                        }
+
+                        @else if (column.pipe === 'timeAgo') {
+
+                        {{ row[column.field] | timeAgo }}
+
+                        }
+
+                        @else if (column.field === 'name') {
+
+                        <span [appHighlightMatch]="row.name" [searchTerm]="''">
+                        </span>
+
+                        }
+
+                        @else {
+
+                        {{ row[column.field] }}
 
                         }
 
@@ -106,6 +131,7 @@
         </table>
 
     </div>
+
     }
 
 </div>

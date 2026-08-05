@@ -42,6 +42,8 @@ import { ExportService } from '../../../../shared/services/export.service';
 import { PdfExportService } from '../../../../shared/services/pdf-export.service';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { CanComponentDeactivate } from '../../../../core/models/can-component-deactivate';
+import { DebounceClickDirective } from '../../../../shared/directives/debounce-click.directive';
+import { PermissionDirective } from '../../../../shared/directives/permission.directive';
 
 @Component({
   selector: 'app-product-list',
@@ -50,7 +52,9 @@ import { CanComponentDeactivate } from '../../../../core/models/can-component-de
     CommonModule,
     FormsModule,
     DataGrid,
-    ProductForm
+    ProductForm,
+    DebounceClickDirective,
+    PermissionDirective,
   ],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss'
@@ -108,7 +112,8 @@ export class ProductList implements OnInit, CanComponentDeactivate {
       {
         field: 'price',
         header: 'Price',
-        sortable: true
+        sortable: true,
+        pipe: 'currency'
       },
       {
         field: 'stock',
@@ -118,13 +123,20 @@ export class ProductList implements OnInit, CanComponentDeactivate {
       {
         field: 'status',
         header: 'Status',
-        sortable: true
+        sortable: true,
+        pipe: 'status'
       },
       {
         field: 'actions',
         header: 'Actions',
         template: this.actionTemplate
-      }
+      },
+      {
+        field: 'createdAt',
+        header: 'Created',
+        sortable: true,
+        pipe: 'timeAgo'
+      },
 
     ];
 
