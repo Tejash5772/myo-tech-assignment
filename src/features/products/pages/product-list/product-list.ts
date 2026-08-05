@@ -107,7 +107,7 @@ export class ProductList implements OnInit, CanComponentDeactivate {
   imageTemplate!: TemplateRef<Product>;
 
   page = 1;
-  pageSize = 10;
+  pageSize = 5;
 
   sortField = 'id';
   sortDirection: 'asc' | 'desc' = 'asc';

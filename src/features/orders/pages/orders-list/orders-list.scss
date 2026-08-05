@@ -1,0 +1,26 @@
+.orders-page {
+    padding: 24px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.page-header h2 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.page-header p {
+    margin: 4px 0 0;
+    color: #6c757d;
+}
+
+.alert {
+    margin-bottom: 20px;
+}

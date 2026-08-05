@@ -1,1 +1,298 @@
-<p>orders-form works!</p>
+<div class="order-form-page">
+
+    <h2>Create Order</h2>
+
+    <form [formGroup]="orderForm" (ngSubmit)="save()">
+
+        <!-- CUSTOMER -->
+        <section formGroupName="customer">
+            <h3>Customer</h3>
+
+            <div>
+                <label for="customerName">Name</label>
+                <input id="customerName" type="text" formControlName="name" />
+
+                @if (
+                orderForm.get('customer.name')?.touched &&
+                orderForm.get('customer.name')?.hasError('required')
+                ) {
+                <small>Name is required.</small>
+                }
+            </div>
+
+            <div>
+                <label for="customerEmail">Email</label>
+                <input id="customerEmail" type="email" formControlName="email" />
+
+                @if (
+                orderForm.get('customer.email')?.touched &&
+                orderForm.get('customer.email')?.invalid
+                ) {
+                <small>Enter a valid email.</small>
+                }
+            </div>
+
+            <div>
+                <label for="customerPhone">Phone</label>
+                <input id="customerPhone" type="text" formControlName="phone" />
+            </div>
+        </section>
+
+
+        <!-- ITEMS -->
+        <section>
+            <div class="section-header">
+                <h3>Items</h3>
+
+                <button type="button" (click)="addItem()">
+                    + Add Item
+                </button>
+            </div>
+
+            <div formArrayName="items">
+
+                @for (item of items.controls; track $index) {
+
+                <div class="item-row" [formGroupName]="$index">
+
+                    <div>
+                        <label>Product</label>
+
+                        <select formControlName="productId">
+
+                            <option [ngValue]="null">
+                                Select product
+                            </option>
+
+                            @for (product of products; track product.id) {
+
+                            <option [ngValue]="product.id">
+                                {{ product.name }}
+                                — {{ product.price | number:'1.2-2' }}
+                                — Stock: {{ product.stock }}
+                            </option>
+
+                            }
+
+                        </select>
+
+                        @if (
+                        item.get('productId')?.touched &&
+                        item.get('productId')?.hasError('required')
+                        ) {
+                        <small>Product is required.</small>
+                        }
+                    </div>
+
+
+                    <div>
+                        <label>Quantity</label>
+
+                        <input type="number" min="1" formControlName="quantity" />
+
+                        @if (
+                        item.get('quantity')?.hasError('stockUnavailable')
+                        ) {
+
+                        <small>
+                            Stock unavailable.
+
+                            Available:
+                            {{
+                            item
+                            .get('quantity')
+                            ?.getError('stockUnavailable')
+                            ?.available
+                            }}
+
+                            Requested:
+                            {{
+                            item
+                            .get('quantity')
+                            ?.getError('stockUnavailable')
+                            ?.requested
+                            }}
+                        </small>
+
+                        }
+
+                        @if (
+                        item.get('quantity')?.touched &&
+                        item.get('quantity')?.hasError('min')
+                        ) {
+                        <small>Quantity must be at least 1.</small>
+                        }
+                    </div>
+
+
+                    <div>
+                        <label>Price</label>
+
+                        <input type="number" min="0" formControlName="price" />
+                    </div>
+
+
+                    <div>
+                        <label>Item Subtotal</label>
+
+                        <strong>
+                            {{ getItemSubtotal(item) | number:'1.2-2' }}
+                        </strong>
+                    </div>
+
+
+                    <button type="button" (click)="removeItem($index)">
+                        Remove
+                    </button>
+
+                </div>
+
+                }
+
+            </div>
+        </section>
+
+
+        <!-- TAXES -->
+        <section>
+
+            <div class="section-header">
+
+                <h3>Taxes</h3>
+
+                <button type="button" (click)="addTax()">
+                    + Add Tax
+                </button>
+
+            </div>
+
+            <div formArrayName="taxes">
+
+                @for (tax of taxes.controls; track $index) {
+
+                <div class="tax-row" [formGroupName]="$index">
+
+                    <input type="text" placeholder="Tax name" formControlName="name" [class.is-invalid]="
+        tax.get('name')?.invalid &&
+        tax.get('name')?.touched
+    " />
+
+
+                    <input type="number" min="0" placeholder="Rate %" formControlName="rate" />
+
+                    <button type="button" (click)="removeTax($index)">
+                        Remove
+                    </button>
+
+                </div>
+
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- DISCOUNTS -->
+        <section>
+
+            <div class="section-header">
+
+                <h3>Discounts</h3>
+
+                <button type="button" (click)="addDiscount()">
+                    + Add Discount
+                </button>
+
+            </div>
+
+            <div formArrayName="discounts">
+
+                @for (discount of discounts.controls; track $index) {
+
+                <div class="discount-row" [formGroupName]="$index">
+
+                    <input type="text" placeholder="Discount name" formControlName="name" [class.is-invalid]="
+        discount.get('name')?.invalid &&
+        discount.get('name')?.touched
+    " />
+
+                    <input type="number" min="0" placeholder="Amount" formControlName="amount" />
+
+                    <button type="button" (click)="removeDiscount($index)">
+                        Remove
+                    </button>
+
+                </div>
+
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- SHIPPING -->
+        <section>
+
+            <h3>Shipping</h3>
+
+            <input type="number" min="0" formControlName="shipping" />
+
+        </section>
+
+
+        <!-- SUMMARY -->
+        <section class="order-summary">
+
+            <h3>Order Summary</h3>
+
+            <div>
+                <span>Subtotal</span>
+                <strong>
+                    {{ subtotal | number:'1.2-2' }}
+                </strong>
+            </div>
+
+            <div>
+                <span>Tax</span>
+                <strong>
+                    {{ taxTotal | number:'1.2-2' }}
+                </strong>
+            </div>
+
+            <div>
+                <span>Discount</span>
+                <strong>
+                    -{{ discountTotal | number:'1.2-2' }}
+                </strong>
+            </div>
+
+            <div>
+                <span>Shipping</span>
+                <strong>
+                    {{ shipping | number:'1.2-2' }}
+                </strong>
+            </div>
+
+            <hr />
+
+            <div>
+                <strong>Total</strong>
+
+                <strong>
+                    {{ grandTotal | number:'1.2-2' }}
+                </strong>
+            </div>
+
+        </section>
+
+
+        <!-- SUBMIT -->
+        <button type="submit" [disabled]="saving">
+            {{ saving ? 'Saving...' : 'Create Order' }}
+        </button>
+
+    </form>
+
+</div>

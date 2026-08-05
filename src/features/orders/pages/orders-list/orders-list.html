@@ -1,1 +1,34 @@
-<p>orders-list works!</p>
+<div class="orders-page">
+
+    <div class="page-header">
+
+        <div>
+            <h2>Orders</h2>
+            <p>Manage customer orders</p>
+        </div>
+
+        <button type="button" class="btn btn-primary" (click)="goToCreateOrder()">
+            + Create Order
+        </button>
+
+    </div>
+
+
+    @if (errorMessage) {
+
+    <div class="alert alert-danger">
+        {{ errorMessage }}
+
+        <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="loadOrders()">
+            Retry
+        </button>
+    </div>
+
+    }
+
+
+    <app-data-grid [rows]="orders" [columns]="columns" [loading]="loading" [page]="page" [pageSize]="pageSize"
+        [totalRecords]="totalRecords" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
+        (sortChange)="onSortChange($event)" (rowClick)="onRowClick($event)" />
+
+</div>

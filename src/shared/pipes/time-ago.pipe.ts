@@ -6,48 +6,39 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class TimeAgoPipe implements PipeTransform {
 
-    transform(value: string | Date): string {
+    transform(value: string | Date | null | undefined): string {
+
+        if (!value) {
+            return '';
+        }
 
         const date = new Date(value);
 
-        const seconds = Math.floor(
-
-            (Date.now() - date.getTime()) / 1000
-
-        );
-
-        const minutes = Math.floor(seconds / 60);
-
-        const hours = Math.floor(minutes / 60);
-
-        const days = Math.floor(hours / 24);
-
-        if (seconds < 60) {
-
-            return 'Just now';
-
+        if (isNaN(date.getTime())) {
+            return '';
         }
 
-        if (minutes < 60) {
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
 
-            return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        const diffSeconds = Math.floor(diffMs / 1000);
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
 
+        if (diffSeconds < 60) {
+            return 'just now';
         }
 
-        if (hours < 24) {
-
-            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-
+        if (diffMinutes < 60) {
+            return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
         }
 
-        if (days < 30) {
-
-            return `${days} day${days > 1 ? 's' : ''} ago`;
-
+        if (diffHours < 24) {
+            return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
         }
 
-        return date.toLocaleDateString();
-
+        return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
     }
 
 }
