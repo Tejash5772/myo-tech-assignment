@@ -1,12 +1,11 @@
 <div class="card shadow-sm position-relative">
 
     @if (loading) {
-    <div class="loading-overlay">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    }
+
+    <app-skeleton-loader [rows]="pageSize" [columns]="columns.length">
+    </app-skeleton-loader>
+
+    } @else {
 
     <div class="table-responsive">
 
@@ -107,6 +106,7 @@
         </table>
 
     </div>
+    }
 
 </div>
 

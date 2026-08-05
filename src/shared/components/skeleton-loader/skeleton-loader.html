@@ -1,0 +1,43 @@
+<table class="table align-middle">
+
+    <thead>
+
+        <tr>
+
+            @for (column of columnIndexes.slice(0, columns); track $index) {
+
+            <th>
+
+                <div class="skeleton skeleton-header"></div>
+
+            </th>
+
+            }
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @for (row of rowIndexes.slice(0, rows); track $index) {
+
+        <tr>
+
+            @for (column of columnIndexes.slice(0, columns); track $index) {
+
+            <td>
+
+                <div class="skeleton skeleton-cell"></div>
+
+            </td>
+
+            }
+
+        </tr>
+
+        }
+
+    </tbody>
+
+</table>

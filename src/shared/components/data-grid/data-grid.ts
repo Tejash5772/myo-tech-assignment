@@ -13,12 +13,14 @@ import {
 
 import { GridColumn } from '../../../core/models/grid-column';
 import { GridSort } from '../../../core/models/grid-sort';
+import { SkeletonLoader } from '../skeleton-loader/skeleton-loader';
 
 @Component({
   selector: 'app-data-grid',
   standalone: true,
   imports: [
     CommonModule,
+    SkeletonLoader,
     NgTemplateOutlet
   ],
   templateUrl: './data-grid.html',
