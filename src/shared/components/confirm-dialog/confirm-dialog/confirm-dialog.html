@@ -1,0 +1,47 @@
+@if (dialog.isOpen()) {
+
+<div class="modal-backdrop-custom">
+
+    <div class="confirm-dialog">
+
+        <div class="confirm-header">
+
+            <h5 class="mb-0">
+
+                {{ dialog.options()?.title }}
+
+            </h5>
+
+        </div>
+
+        <div class="confirm-body">
+
+            <p class="mb-0">
+
+                {{ dialog.options()?.message }}
+
+            </p>
+
+        </div>
+
+        <div class="confirm-footer">
+
+            <button class="btn btn-secondary" (click)="dialog.cancelAction()">
+
+                {{ dialog.options()?.cancelText }}
+
+            </button>
+
+            <button class="btn btn-danger" (click)="dialog.confirmAction()">
+
+                {{ dialog.options()?.confirmText }}
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+}

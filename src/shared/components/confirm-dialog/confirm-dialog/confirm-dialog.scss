@@ -1,0 +1,48 @@
+.modal-backdrop-custom {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.confirm-dialog {
+    width: 420px;
+    max-width: 95%;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+    animation: dialogFade .2s ease-in-out;
+}
+
+.confirm-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.confirm-body {
+    padding: 20px;
+}
+
+.confirm-footer {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #dee2e6;
+}
+
+@keyframes dialogFade {
+    from {
+        transform: translateY(-15px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

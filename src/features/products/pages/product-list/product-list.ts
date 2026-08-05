@@ -40,6 +40,7 @@ import { ProductForm } from '../product-form/product-form';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ExportService } from '../../../../shared/services/export.service';
 import { PdfExportService } from '../../../../shared/services/pdf-export.service';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-product-list',
@@ -62,6 +63,7 @@ export class ProductList implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly exportService = inject(ExportService);
   private readonly pdfExportService = inject(PdfExportService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly products = signal<Product[]>([]);
   readonly loading = signal(false);
@@ -84,8 +86,6 @@ export class ProductList implements OnInit {
   columns: GridColumn[] = [];
 
   private readonly searchSubject = new Subject<string>();
-  private deletedProduct: Product | null = null;
-  private undoTimeout?: number;
 
   ngOnInit(): void {
 
@@ -302,6 +302,8 @@ export class ProductList implements OnInit {
 
   saveProduct(product: Partial<Product>): void {
 
+    this.loading.set(true);
+
     const request = this.selectedProduct()
 
       ? this.productService.update(
@@ -321,7 +323,15 @@ export class ProductList implements OnInit {
 
     request
       .pipe(
+
+        finalize(() => {
+
+          this.loading.set(false);
+
+        }),
+
         takeUntilDestroyed(this.destroyRef)
+
       )
       .subscribe({
 
@@ -331,19 +341,45 @@ export class ProductList implements OnInit {
 
           this.loadProducts();
 
+          this.toastService.success(
+
+            this.selectedProduct()
+
+              ? 'Product updated successfully.'
+
+              : 'Product created successfully.'
+
+          );
+
+        },
+
+        error: () => {
+
+          this.toastService.error(
+
+            'Failed to save product.'
+
+          );
+
         }
 
       });
 
   }
 
-  deleteProduct(product: Product): void {
+  async deleteProduct(product: Product): Promise<void> {
 
-    const confirmed = confirm(
+    const confirmed = await this.confirmDialog.confirm({
 
-      `Delete "${product.name}"?`
+      title: 'Delete Product',
 
-    );
+      message: `Are you sure you want to delete "${product.name}"?`,
+
+      confirmText: 'Delete',
+
+      cancelText: 'Cancel'
+
+    });
 
     if (!confirmed) {
 
@@ -355,83 +391,26 @@ export class ProductList implements OnInit {
 
     this.productService
       .delete(product.id)
+      .pipe(
+
+        finalize(() => {
+
+          this.loading.set(false);
+
+        }),
+
+        takeUntilDestroyed(this.destroyRef)
+
+      )
       .subscribe({
 
         next: () => {
 
-          this.loading.set(false);
-
-          this.deletedProduct = product;
-
           this.loadProducts();
-
-          if (this.undoTimeout) {
-
-            clearTimeout(this.undoTimeout);
-
-          }
 
           this.toastService.success(
 
-            'Product deleted',
-
-            {
-
-              label: 'Undo',
-
-              callback: () => {
-
-                this.restoreDeletedProduct();
-
-              }
-
-            }
-
-          );
-
-          this.undoTimeout = window.setTimeout(() => {
-
-            this.deletedProduct = null;
-
-          }, 5000);
-
-        },
-
-        error: () => {
-
-          this.loading.set(false);
-
-        }
-
-      });
-
-  }
-
-  private restoreDeletedProduct(): void {
-
-    if (!this.deletedProduct) {
-
-      return;
-
-    }
-
-    this.loading.set(true);
-
-    this.productService
-      .create(this.deletedProduct)
-      .subscribe({
-
-        next: () => {
-
-          this.loading.set(false);
-
-          this.loadProducts();
-
-          this.deletedProduct = null;
-
-          this.toastService.success(
-
-            'Product restored'
+            'Product deleted successfully.'
 
           );
 
@@ -439,7 +418,11 @@ export class ProductList implements OnInit {
 
         error: () => {
 
-          this.loading.set(false);
+          this.toastService.error(
+
+            'Failed to delete product.'
+
+          );
 
         }
 
