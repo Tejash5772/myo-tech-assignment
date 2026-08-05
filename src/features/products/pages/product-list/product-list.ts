@@ -41,6 +41,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { ExportService } from '../../../../shared/services/export.service';
 import { PdfExportService } from '../../../../shared/services/pdf-export.service';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
+import { CanComponentDeactivate } from '../../../../core/models/can-component-deactivate';
 
 @Component({
   selector: 'app-product-list',
@@ -54,7 +55,7 @@ import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.s
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss'
 })
-export class ProductList implements OnInit {
+export class ProductList implements OnInit, CanComponentDeactivate {
 
   private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
@@ -76,6 +77,9 @@ export class ProductList implements OnInit {
 
   @ViewChild('actionTemplate', { static: true })
   actionTemplate!: TemplateRef<Product>;
+
+  @ViewChild(ProductForm)
+  productForm?: ProductForm;
 
   page = 1;
   pageSize = 10;
@@ -292,7 +296,23 @@ export class ProductList implements OnInit {
 
   }
 
-  closeModal(): void {
+  async closeModal(): Promise<void> {
+
+    if (!this.selectedProduct()) {
+
+      this.showModal.set(false);
+
+      return;
+
+    }
+
+    const canClose = await (this.productForm?.canDeactivate() ?? true);
+
+    if (!canClose) {
+
+      return;
+
+    }
 
     this.selectedProduct.set(null);
 
@@ -430,9 +450,17 @@ export class ProductList implements OnInit {
 
   }
 
-  exportProducts(): void {
+  private getExportData(): Array<{
+    ID: number;
+    Name: string;
+    Category: string;
+    Price: number;
+    Stock: number;
+    Status: string;
+    CreatedAt: string;
+  }> {
 
-    const data = this.products().map(product => ({
+    return this.products().map(product => ({
 
       ID: product.id,
 
@@ -452,11 +480,15 @@ export class ProductList implements OnInit {
 
     }));
 
+  }
+
+  exportProducts(): void {
+
     this.exportService.exportToCsv(
 
       'products',
 
-      data
+      this.getExportData()
 
     );
 
@@ -464,35 +496,27 @@ export class ProductList implements OnInit {
 
   exportProductsPdf(): void {
 
-    const data = this.products().map(product => ({
-
-      ID: product.id,
-
-      Name: product.name,
-
-      Category: this.categories()
-        .find(category => category.id === product.categoryId)
-        ?.name ?? '',
-
-      Price: product.price,
-
-      Stock: product.stock,
-
-      Status: product.status,
-
-      CreatedAt: product.createdAt
-
-    }));
-
     this.pdfExportService.exportToPdf(
 
       'products',
 
       'Products Report',
 
-      data
+      this.getExportData()
 
     );
+
+  }
+
+  canDeactivate(): boolean | Promise<boolean> {
+
+    if (!this.showModal()) {
+
+      return true;
+
+    }
+
+    return this.productForm?.canDeactivate() ?? true;
 
   }
 

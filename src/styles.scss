@@ -1,1 +1,234 @@
-/* You can add global styles to this file, and also import other style files */
+/* =====================================================
+   Theme Variables
+===================================================== */
+
+:root {
+
+    --app-bg: #ffffff;
+    --app-surface: #ffffff;
+    --app-surface-2: #f8f9fa;
+    --app-border: #dee2e6;
+    --app-text: #212529;
+    --app-muted: #6c757d;
+
+}
+
+[data-theme='dark'] {
+
+    --app-bg: #1e1e1e;
+    --app-surface: #2b2b2b;
+    --app-surface-2: #343a40;
+    --app-border: #495057;
+    --app-text: #f8f9fa;
+    --app-muted: #adb5bd;
+
+    .table-hover tbody tr:hover td,
+    .table-hover tbody tr:hover th {
+
+        background: #3a3f44 !important;
+
+        color: #ffffff !important;
+
+    }
+
+}
+
+html,
+body {
+
+    background: var(--app-bg);
+    color: var(--app-text);
+    transition: .25s ease;
+
+}
+
+body {
+
+    min-height: 100vh;
+
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+label {
+
+    color: var(--app-text);
+
+}
+
+.form-control,
+.form-select {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+    border: 1px solid var(--app-border);
+
+}
+
+.form-control::placeholder {
+
+    color: var(--app-muted);
+
+}
+
+.form-control:focus,
+.form-select:focus {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: #0d6efd;
+
+    box-shadow: none;
+
+}
+
+.form-control:disabled,
+.form-select:disabled {
+
+    background: var(--app-surface-2);
+
+}
+
+.table {
+
+    color: var(--app-text);
+
+}
+
+.table th {
+
+    background: var(--app-surface-2);
+    color: var(--app-text);
+    border-color: var(--app-border);
+
+}
+
+.table td {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-border);
+
+}
+
+.table-hover tbody tr:hover td {
+
+    background: rgba(13,110,253,.08);
+
+}
+
+.page-link {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-border);
+
+}
+
+.page-link:hover {
+
+    background: var(--app-surface-2);
+
+}
+
+.page-item.active .page-link {
+
+    background: #0d6efd;
+
+    border-color: #0d6efd;
+
+}
+
+.modal-content-custom {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+    border: 1px solid var(--app-border);
+
+}
+
+.confirm-dialog {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+
+}
+
+.card {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-border);
+
+}
+
+.dropdown-menu {
+
+    background: var(--app-surface);
+    border-color: var(--app-border);
+
+}
+
+.dropdown-item {
+
+    color: var(--app-text);
+
+}
+
+.dropdown-item:hover {
+
+    background: var(--app-surface-2);
+
+}
+
+.toast {
+
+    background: var(--app-surface);
+    color: var(--app-text);
+
+}
+
+.btn-close {
+
+    filter: invert(0);
+
+}
+
+[data-theme='dark'] .btn-close {
+
+    filter: invert(1);
+
+}
+
+
+::-webkit-scrollbar {
+
+    width: 8px;
+
+}
+
+::-webkit-scrollbar-thumb {
+
+    background: #666;
+    border-radius: 20px;
+
+}
+
+::-webkit-scrollbar-track {
+
+    background: var(--app-bg);
+
+}
+
+* {
+
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+
+}

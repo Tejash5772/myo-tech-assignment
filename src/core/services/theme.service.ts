@@ -4,30 +4,30 @@ import {
     signal
 } from '@angular/core';
 
+export type Theme = 'light' | 'dark';
+
 @Injectable({
     providedIn: 'root'
 })
 export class ThemeService {
 
-    readonly theme = signal<'light' | 'dark'>('light');
+    readonly theme = signal<Theme>(
+
+        (localStorage.getItem('theme') as Theme) ?? 'light'
+
+    );
 
     constructor() {
 
-        const savedTheme = localStorage.getItem('theme');
-
-        if (savedTheme === 'light' || savedTheme === 'dark') {
-
-            this.theme.set(savedTheme);
-
-        }
-
         effect(() => {
+
+            const currentTheme = this.theme();
 
             document.documentElement.setAttribute(
 
                 'data-theme',
 
-                this.theme()
+                currentTheme
 
             );
 
@@ -35,7 +35,7 @@ export class ThemeService {
 
                 'theme',
 
-                this.theme()
+                currentTheme
 
             );
 
@@ -43,7 +43,7 @@ export class ThemeService {
 
     }
 
-    toggle(): void {
+    toggleTheme(): void {
 
         this.theme.update(theme =>
 

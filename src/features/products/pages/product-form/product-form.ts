@@ -20,6 +20,8 @@ import {
 import { Product } from '../../../../core/models/product';
 import { Category } from '../../../../core/models/category';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { CanComponentDeactivate } from '../../../../core/models/can-component-deactivate';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-product-form',
@@ -31,10 +33,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss'
 })
-export class ProductForm implements OnInit, OnChanges {
+export class ProductForm implements OnInit, OnChanges, CanComponentDeactivate {
 
   private readonly fb = inject(FormBuilder);
   private readonly draftKey = 'product-form-draft';
+  private readonly confirmDialog = inject(
+    ConfirmDialogService
+  );
 
   @Input()
   product: Product | null = null;
@@ -145,10 +150,10 @@ export class ProductForm implements OnInit, OnChanges {
     );
 
     this.save.emit(
-
       this.form.getRawValue()
-
     );
+
+    this.form.markAsPristine();
 
   }
 
@@ -157,6 +162,28 @@ export class ProductForm implements OnInit, OnChanges {
     localStorage.removeItem(this.draftKey);
 
     this.cancel.emit();
+
+  }
+
+  async canDeactivate(): Promise<boolean> {
+
+    if (!this.form.dirty) {
+
+      return true;
+
+    }
+
+    return this.confirmDialog.confirm({
+
+      title: 'Unsaved Changes',
+
+      message: 'You have unsaved changes. Do you really want to leave this page?',
+
+      confirmText: 'Leave',
+
+      cancelText: 'Stay'
+
+    });
 
   }
 

@@ -1,0 +1,13 @@
+<button class="btn btn-outline-secondary" (click)="themeService.toggleTheme()">
+
+    @if (themeService.theme() === 'light') {
+
+    🌙 Dark Mode
+
+    } @else {
+
+    ☀️ Light Mode
+
+    }
+
+</button>
