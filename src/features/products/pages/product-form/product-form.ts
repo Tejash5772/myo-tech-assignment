@@ -5,7 +5,8 @@ import {
   Output,
   OnChanges,
   SimpleChanges,
-  inject
+  inject,
+  OnInit
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -18,6 +19,7 @@ import {
 
 import { Product } from '../../../../core/models/product';
 import { Category } from '../../../../core/models/category';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-product-form',
@@ -29,9 +31,10 @@ import { Category } from '../../../../core/models/category';
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss'
 })
-export class ProductForm implements OnChanges {
+export class ProductForm implements OnInit, OnChanges {
 
   private readonly fb = inject(FormBuilder);
+  private readonly draftKey = 'product-form-draft';
 
   @Input()
   product: Product | null = null;
@@ -75,21 +78,53 @@ export class ProductForm implements OnChanges {
 
         });
 
+        localStorage.removeItem(this.draftKey);
+
       } else {
 
-        this.form.reset({
+        const draft = localStorage.getItem(this.draftKey);
 
-          name: '',
-          categoryId: 1,
-          price: 0,
-          stock: 0,
-          status: 'Active'
+        if (draft) {
 
-        });
+          this.form.patchValue(
+
+            JSON.parse(draft)
+
+          );
+
+        }
 
       }
 
     }
+
+  }
+
+  ngOnInit(): void {
+
+    this.form.valueChanges
+      .pipe(
+
+        debounceTime(500),
+
+        distinctUntilChanged()
+
+      )
+      .subscribe(value => {
+
+        if (!this.product) {
+
+          localStorage.setItem(
+
+            this.draftKey,
+
+            JSON.stringify(value)
+
+          );
+
+        }
+
+      });
 
   }
 
@@ -103,7 +138,25 @@ export class ProductForm implements OnChanges {
 
     }
 
-    this.save.emit(this.form.getRawValue());
+    localStorage.removeItem(
+
+      this.draftKey
+
+    );
+
+    this.save.emit(
+
+      this.form.getRawValue()
+
+    );
+
+  }
+
+  cancelForm(): void {
+
+    localStorage.removeItem(this.draftKey);
+
+    this.cancel.emit();
 
   }
 

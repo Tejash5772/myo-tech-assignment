@@ -38,6 +38,7 @@ import { GridSort } from '../../../../core/models/grid-sort';
 import { DataGrid } from '../../../../shared/components/data-grid/data-grid';
 import { ProductForm } from '../product-form/product-form';
 import { ToastService } from '../../../../core/services/toast.service';
+import { ExportService } from '../../../../shared/services/export.service';
 
 @Component({
   selector: 'app-product-list',
@@ -58,6 +59,7 @@ export class ProductList implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly toastService = inject(ToastService);
+  private readonly exportService = inject(ExportService);
 
   readonly products = signal<Product[]>([]);
   readonly loading = signal(false);
@@ -440,6 +442,38 @@ export class ProductList implements OnInit {
         }
 
       });
+
+  }
+
+  exportProducts(): void {
+
+    const data = this.products().map(product => ({
+
+      ID: product.id,
+
+      Name: product.name,
+
+      Category: this.categories()
+        .find(category => category.id === product.categoryId)
+        ?.name ?? '',
+
+      Price: product.price,
+
+      Stock: product.stock,
+
+      Status: product.status,
+
+      CreatedAt: product.createdAt
+
+    }));
+
+    this.exportService.exportToCsv(
+
+      'products',
+
+      data
+
+    );
 
   }
 
